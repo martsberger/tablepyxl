@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup as BS
 from openpyxl import Workbook
-from openpyxl.styles import Font, Alignment, Style
 from premailer import transform
+from style import Table
 
 
 def get_tables(doc):
@@ -47,12 +47,15 @@ def table_to_sheet(table, wb):
     insert_table(table, ws, 1, 1)
 
 
-def document_to_xl(doc, filename):
+def document_to_workbook(doc, wb=None):
     """
     Takes a string representation of an html document and writes one sheet for
-    every table in the document. The workbook is written out to a file called filename
+    every table in the document.
+
+    The workbook is returned
     """
-    wb = Workbook()
+    if not wb:
+        wb = Workbook()
     wb.remove_sheet(wb.active)
     inline_styles_doc = transform(doc)
     tables = get_Tables(inline_styles_doc)
@@ -60,6 +63,15 @@ def document_to_xl(doc, filename):
     for table in tables:
         table_to_sheet(table, wb)
 
+    return wb
+
+
+def document_to_xl(doc, filename):
+    """
+    Takes a string representation of an html document and writes one sheet for
+    every table in the document. The workbook is written out to a file called filename
+    """
+    wb = document_to_workbook(doc)
     wb.save(filename)
 
 
@@ -75,82 +87,3 @@ def insert_table_at_cell(table, cell):
     ws = cell.parent
     column, row = cell.column, cell.row
     insert_table(table, ws, column, row)
-
-
-def style_string_to_dict(style):
-    def clean_split(string, delim):
-        return (s.strip() for s in string.split(delim))
-    styles = [clean_split(s, ":") for s in style.split(";") if ":" in s]
-    return dict(styles)
-
-
-def style_dict_to_Style(style):
-    """
-    change css style to openpyxl Style
-    """
-    # Font
-    font_kwargs = {'bold': style.get('font-weight') == 'bold'}
-    font = Font(**font_kwargs)
-
-    # Alignment
-    alignment_kwargs = {'horizontal': style.get('text-align', 'general')}
-    alignment = Alignment(**alignment_kwargs)
-
-    pyxl_style = Style(font=font, alignment=alignment)
-
-    return pyxl_style
-
-
-class Element(object):
-    def __init__(self, element, parent=None):
-        self.element = element
-        self.parent = parent
-        self.style_dict = style_string_to_dict(element.get('style', ''))
-        self._style_cache = None
-
-    def get_style(self, key):
-        if key in self.style_dict:
-            return self.style_dict[key]
-        if self.parent:
-            return self.parent.get_style(key)
-        return None
-
-    def style(self):
-        """
-        Turn the css styles for this element into an openpyxl Style
-        """
-        if not self._style_cache:
-            self._style_cache = style_dict_to_Style(self.style_dict)
-        return self._style_cache
-
-
-class Table(Element):
-    def __init__(self, table):
-        """
-        takes an html table object (from BeautifulSoup)
-        """
-        super(Table, self).__init__(table)
-        self.head = TableHead(table.thead, parent=self)
-        self.body = TableBody(table.tbody, parent=self)
-
-
-class TableHead(Element):
-    def __init__(self, head, parent=None):
-        super(TableHead, self).__init__(head, parent=parent)
-        self.rows = [TableRow(tr, parent=self) for tr in head.find_all('tr')]
-
-
-class TableBody(Element):
-    def __init__(self, body, parent=None):
-        super(TableBody, self).__init__(body, parent=parent)
-        self.rows = [TableRow(tr, parent=self) for tr in body.find_all('tr')]
-
-
-class TableRow(Element):
-    def __init__(self, tr, parent=None):
-        super(TableRow, self).__init__(tr, parent=parent)
-        self.cells = [TableCell(cell, parent=self) for cell in tr.find_all('th') + tr.find_all('td')]
-
-
-class TableCell(Element):
-    pass
