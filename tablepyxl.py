@@ -4,14 +4,6 @@ from premailer import transform
 from style import Table
 
 
-def get_tables(doc):
-    """
-    Turn a string containing html into a list of tables
-    """
-    soup = BS(doc)
-    return soup.find_all('table')
-
-
 def get_Tables(doc):
     soup = BS(doc)
     return [Table(table) for table in soup.find_all('table')]
@@ -20,7 +12,6 @@ def get_Tables(doc):
 def write_rows(worksheet, elem, row, column=1):
     """
     Writes every tr child element of elem to a row in the worksheet
-    elem could be a thead or tbody, so we write each th and td to a cell.
 
     returns the next row after all rows are written
     """
