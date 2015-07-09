@@ -1,4 +1,4 @@
-# This is where we handling translating css styles into openpyxl styles
+# This is where we handle translating css styles into openpyxl styles
 # and cascading those from parent to child in the dom.
 
 from openpyxl.styles import Font, Alignment, PatternFill, Style
@@ -31,7 +31,7 @@ def style_dict_to_Style(style):
     # Fill
     fill = PatternFill()
 
-    pyxl_style = Style(font=font, alignment=alignment)
+    pyxl_style = Style(font=font, alignment=alignment, fill=fill)
 
     return pyxl_style
 
@@ -60,19 +60,20 @@ class StyleDict(dict):
 
 
 class Element(object):
+    """
+    Our base class for representing an html element along with a cascading style.
+    The element is created along with a parent so that the StyleDict that we store
+    can point to the parent's StyleDict.
+    """
     def __init__(self, element, parent=None):
         self.element = element
-        self.parent = parent
         parent_style = parent.style_dict if parent else None
         self.style_dict = StyleDict(style_string_to_dict(element.get('style', '')), parent=parent_style)
         self._style_cache = None
 
+    # TODO: This method is probably not necessary since we implemented StyleDict
     def get_style(self, key):
-        if key in self.style_dict:
-            return self.style_dict[key]
-        if self.parent:
-            return self.parent.get_style(key)
-        return None
+        return self.style_dict.get(key)
 
     def style(self):
         """
@@ -83,6 +84,11 @@ class Element(object):
         return self._style_cache
 
 
+# The concrete implementations of Elements are semantically named for
+# the types of elements we are interested in. This defines a very
+# concrete tree structure for html tables that we expect to deal with.
+# I prefer this compared to allowing Element to have an abitrary number
+# of children and dealing with an abstract element tree.
 class Table(Element):
     def __init__(self, table):
         """
