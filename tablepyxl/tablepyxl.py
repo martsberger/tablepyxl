@@ -19,7 +19,7 @@ def write_rows(worksheet, elem, row, column=1):
     for table_row in elem.rows:
         for table_cell in table_row.cells:
             cell = worksheet.cell(row=row, column=column)
-            cell.value = table_cell.element.get_text(strip=True)
+            cell.value = table_cell.element.get_text(separator="\n", strip=True)
             style = table_cell.style()
             cell.font = style.font
             cell.alignment = style.alignment
