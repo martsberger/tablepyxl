@@ -67,8 +67,10 @@ def document_to_xl(doc, filename, base_url=None):
 
 
 def insert_table(table, worksheet, column, row):
-    row = write_rows(worksheet, table.head, row, column)
-    row = write_rows(worksheet, table.body, row, column)
+    if table.head:
+        row = write_rows(worksheet, table.head, row, column)
+    if table.body:
+        row = write_rows(worksheet, table.body, row, column)
 
 
 def insert_table_at_cell(table, cell):

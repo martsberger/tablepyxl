@@ -95,8 +95,8 @@ class Table(Element):
         takes an html table object (from BeautifulSoup)
         """
         super(Table, self).__init__(table)
-        self.head = TableHead(table.thead, parent=self)
-        self.body = TableBody(table.tbody, parent=self)
+        self.head = TableHead(table.thead, parent=self) if table.thead else None
+        self.body = TableBody(table.tbody or table, parent=self)
 
 
 class TableHead(Element):
