@@ -19,7 +19,7 @@ def write_rows(worksheet, elem, row, column=1):
     for table_row in elem.rows:
         for table_cell in table_row.cells:
             cell = worksheet.cell(row=row, column=column)
-            cell.value = table_cell.element.text
+            cell.value = table_cell.element.get_text(separator="\n", strip=True)
             style = table_cell.style()
             cell.font = style.font
             cell.alignment = style.alignment
@@ -38,7 +38,7 @@ def table_to_sheet(table, wb):
     insert_table(table, ws, 1, 1)
 
 
-def document_to_workbook(doc, wb=None):
+def document_to_workbook(doc, wb=None, base_url=None):
     """
     Takes a string representation of an html document and writes one sheet for
     every table in the document.
@@ -48,7 +48,7 @@ def document_to_workbook(doc, wb=None):
     if not wb:
         wb = Workbook()
     wb.remove_sheet(wb.active)
-    inline_styles_doc = transform(doc)
+    inline_styles_doc = transform(doc, base_url)
     tables = get_Tables(inline_styles_doc)
 
     for table in tables:
@@ -57,18 +57,20 @@ def document_to_workbook(doc, wb=None):
     return wb
 
 
-def document_to_xl(doc, filename):
+def document_to_xl(doc, filename, base_url=None):
     """
     Takes a string representation of an html document and writes one sheet for
     every table in the document. The workbook is written out to a file called filename
     """
-    wb = document_to_workbook(doc)
+    wb = document_to_workbook(doc, base_url=base_url)
     wb.save(filename)
 
 
 def insert_table(table, worksheet, column, row):
-    row = write_rows(worksheet, table.head, row, column)
-    row = write_rows(worksheet, table.body, row, column)
+    if table.head:
+        row = write_rows(worksheet, table.head, row, column)
+    if table.body:
+        row = write_rows(worksheet, table.body, row, column)
 
 
 def insert_table_at_cell(table, cell):
