@@ -7,6 +7,7 @@ setup(
     url='https://github.com/martsberger/tablepyxl',
     author='Brad Martsberger',
     author_email='bmarts@procuredhealth.com',
+    license='MIT',
     packages=find_packages(),
     install_requires=['openpyxl', 'beautifulsoup4', 'premailer']
 )
