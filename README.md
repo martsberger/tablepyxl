@@ -4,4 +4,4 @@ A bridge between html tables and openpyxl
 
 ## License
 
-MIT
+MIT (http://opensource.org/licenses/MIT)
