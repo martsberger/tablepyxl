@@ -23,6 +23,7 @@ def write_rows(worksheet, elem, row, column=1):
             style = table_cell.style()
             cell.font = style.font
             cell.alignment = style.alignment
+            cell.fill = style.fill
             column += 1
         row += 1
         column = initial_column

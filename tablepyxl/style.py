@@ -1,7 +1,7 @@
 # This is where we handle translating css styles into openpyxl styles
 # and cascading those from parent to child in the dom.
 
-from openpyxl.styles import Font, Alignment, PatternFill, Style
+from openpyxl.styles import Font, Alignment, PatternFill, Style, fills
 
 
 def style_string_to_dict(style):
@@ -29,7 +29,12 @@ def style_dict_to_Style(style):
     alignment = Alignment(**alignment_kwargs)
 
     # Fill
-    fill = PatternFill()
+    bg_color = style.get('background-color', 'FFFFFF')
+    if bg_color.startswith('#'):
+        bg_color = bg_color[1:]
+    fill_kwargs = {'fill_type': fills.FILL_SOLID,
+                   'start_color': bg_color}
+    fill = PatternFill(**fill_kwargs)
 
     pyxl_style = Style(font=font, alignment=alignment, fill=fill)
 
