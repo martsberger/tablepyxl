@@ -21,6 +21,8 @@ def write_rows(worksheet, elem, row, column=1):
             cell = worksheet.cell(row=row, column=column)
             cell.value = table_cell.element.get_text(separator="\n", strip=True)
             cell.style = table_cell.style()
+            if worksheet.column_dimensions.values()[column-1].width < len(cell.value):
+                worksheet.column_dimensions.values()[column-1].width = len(cell.value)
             column += 1
         row += 1
         column = initial_column
