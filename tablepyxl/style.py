@@ -2,6 +2,7 @@
 # and cascading those from parent to child in the dom.
 
 from openpyxl.styles import Font, Alignment, PatternFill, Style, fills
+from openpyxl.styles.borders import Border, Side
 
 
 def style_string_to_dict(style):
@@ -29,14 +30,21 @@ def style_dict_to_Style(style):
     alignment = Alignment(**alignment_kwargs)
 
     # Fill
-    bg_color = style.get('background-color', 'FFFFFF')
-    if bg_color.startswith('#'):
-        bg_color = bg_color[1:]
-    fill_kwargs = {'fill_type': fills.FILL_SOLID,
-                   'start_color': bg_color}
-    fill = PatternFill(**fill_kwargs)
+    bg_color = style.get('background-color')
+    if bg_color:
+        if bg_color.startswith('#'):
+            bg_color = bg_color[1:]
+        fill_kwargs = {'fill_type': fills.FILL_SOLID,
+                       'start_color': bg_color}
+        fill = PatternFill(**fill_kwargs)
+    else:
+        fill = PatternFill()
 
-    pyxl_style = Style(font=font, alignment=alignment, fill=fill)
+    default_side = Side(style='thin', color='AAAAAA')
+    default_border = Border(top=default_side, right=default_side,
+                            bottom=default_side, left=default_side)
+
+    pyxl_style = Style(font=font, fill=fill, border=default_border, alignment=alignment)
 
     return pyxl_style
 

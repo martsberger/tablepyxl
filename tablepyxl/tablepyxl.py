@@ -20,10 +20,7 @@ def write_rows(worksheet, elem, row, column=1):
         for table_cell in table_row.cells:
             cell = worksheet.cell(row=row, column=column)
             cell.value = table_cell.element.get_text(separator="\n", strip=True)
-            style = table_cell.style()
-            cell.font = style.font
-            cell.alignment = style.alignment
-            cell.fill = style.fill
+            cell.style = table_cell.style()
             column += 1
         row += 1
         column = initial_column
