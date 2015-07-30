@@ -18,9 +18,14 @@ def write_rows(worksheet, elem, row, column=1):
     initial_column = column
     for table_row in elem.rows:
         for table_cell in table_row.cells:
-            cell = worksheet.cell(row=row, column=column)
-            cell.value = table_cell.element.get_text(separator="\n", strip=True)
-            cell.style = table_cell.style()
+            cell = worksheet.cell(row=row, column=column, value=table_cell.value)
+            style = table_cell.style()
+            cell.font = style.font
+            cell.alignment = style.alignment
+            cell.number_format = style.number_format
+            cell.fill = style.fill
+            if table_cell.data_type:
+                cell.data_type = table_cell.data_type
             if worksheet.column_dimensions.values()[column-1].width < len(cell.value):
                 worksheet.column_dimensions.values()[column-1].width = len(cell.value)
             column += 1
