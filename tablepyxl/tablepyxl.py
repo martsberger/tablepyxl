@@ -1,7 +1,11 @@
 from bs4 import BeautifulSoup as BS
 from openpyxl import Workbook
-from premailer import transform
+from premailer import Premailer
 from style import Table
+
+
+CELL_TYPES = {'TYPE_STRING', 'TYPE_FORMULA', 'TYPE_NUMERIC', 'TYPE_BOOL',
+              'TYPE_NULL', 'TYPE_INLINE', 'TYPE_ERROR', 'TYPE_FORMULA_CACHE_STRING'}
 
 
 def get_Tables(doc):
@@ -21,8 +25,11 @@ def write_rows(worksheet, elem, row, column=1):
             cell = worksheet.cell(row=row, column=column)
             cell.value = table_cell.element.get_text(separator="\n", strip=True)
             cell.style = table_cell.style()
-            if worksheet.column_dimensions.values()[column-1].width < len(cell.value):
-                worksheet.column_dimensions.values()[column-1].width = len(cell.value)
+            cell_type = CELL_TYPES & set(table_cell.element.get('class', []))
+            if cell_type:
+                cell.data_type = getattr(cell, cell_type.pop())
+            if worksheet.column_dimensions.values()[column - 1].width < len(cell.value):
+                worksheet.column_dimensions.values()[column - 1].width = len(cell.value)
             column += 1
         row += 1
         column = initial_column
@@ -48,7 +55,7 @@ def document_to_workbook(doc, wb=None, base_url=None):
     if not wb:
         wb = Workbook()
     wb.remove_sheet(wb.active)
-    inline_styles_doc = transform(doc, base_url)
+    inline_styles_doc = Premailer(doc, base_url=base_url, remove_classes=False).transform()
     tables = get_Tables(inline_styles_doc)
 
     for table in tables:
