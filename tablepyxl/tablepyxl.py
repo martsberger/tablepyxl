@@ -4,10 +4,6 @@ from premailer import Premailer
 from style import Table
 
 
-CELL_TYPES = {'TYPE_STRING', 'TYPE_FORMULA', 'TYPE_NUMERIC', 'TYPE_BOOL',
-              'TYPE_NULL', 'TYPE_INLINE', 'TYPE_ERROR', 'TYPE_FORMULA_CACHE_STRING'}
-
-
 def get_Tables(doc):
     soup = BS(doc)
     return [Table(table) for table in soup.find_all('table')]
@@ -23,14 +19,7 @@ def write_rows(worksheet, elem, row, column=1):
     for table_row in elem.rows:
         for table_cell in table_row.cells:
             cell = worksheet.cell(row=row, column=column, value=table_cell.value)
-            style = table_cell.style()
-            cell.font = style.font
-            cell.alignment = style.alignment
-            cell.number_format = style.number_format
-            cell.fill = style.fill
-            cell_type = CELL_TYPES & set(table_cell.element.get('class', []))
-            if cell_type:
-                cell.data_type = getattr(cell, cell_type.pop())
+            table_cell.format(cell)
             if worksheet.column_dimensions.values()[column - 1].width < len(cell.value):
                 worksheet.column_dimensions.values()[column - 1].width = len(cell.value)
             column += 1

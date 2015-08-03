@@ -129,39 +129,26 @@ class TableRow(Element):
 
 
 class TableCell(Element):
-    def __init__(self, *args, **kwargs):
-        super(TableCell, self).__init__(*args, **kwargs)
-        self._raw_value = self.element.get_text(separator="\n", strip=True)
-        self._display_value = None
-        self.data_type = None
+    CELL_TYPES = {'TYPE_STRING', 'TYPE_FORMULA', 'TYPE_NUMERIC', 'TYPE_BOOL',
+                  'TYPE_NULL', 'TYPE_INLINE', 'TYPE_ERROR', 'TYPE_FORMULA_CACHE_STRING'}
 
-    def style(self):
-        self._style_cache = super(TableCell, self).style()
-        if self._raw_value.startswith('$') or self._raw_value.startswith('-$'):
-            self._style_cache.number_format = FORMAT_CURRENCY_USD_SIMPLE
-        elif type(self._display_value) == float or type(self._display_value) == int:
-            self._style_cache.number_format == '#,##0.##'
-        return self._style_cache
+    def data_type(self):
+        cell_type = self.CELL_TYPES & set(self.element.get('class', []))
+        if cell_type:
+            return getattr(Cell, cell_type.pop(), Cell.TYPE_STRING)
+        return Cell.TYPE_STRING
 
-    def set_display_value(self):
-        self._display_value = self._raw_value.replace('$', '')
-        try:
-            self._display_value = int(self._display_value)
-            self.data_type = Cell.TYPE_NUMERIC
-        except ValueError:
-            try:
-                self._display_value = float(self._display_value)
-                self.data_type = Cell.TYPE_NUMERIC
-            except ValueError:
-                self._display_value = self._raw_value
+    def number_format(self):
+        if 'currency' in self.element.get('class', []):
+            return FORMAT_CURRENCY_USD_SIMPLE
+        if self.data_type() == Cell.TYPE_NUMERIC:
+            return '#,##0.##'
 
-    @property
-    def value(self):
-        if not self._display_value:
-            self.set_display_value()
-        return unicode(self._display_value)
-
-    @value.setter
-    def value(self, val):
-        self._raw_value = val
-        self.set_display_value()
+    def format(self, cell):
+        style = self.style()
+        cell.font = style.font
+        cell.alignment = style.alignment
+        cell.number_format = style.number_format
+        cell.fill = style.fill
+        cell.data_type = self.data_type()
+        cell._style_cache.number_format = self.number_format()
