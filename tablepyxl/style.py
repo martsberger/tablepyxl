@@ -150,7 +150,12 @@ class TableCell(Element):
         if 'TYPE_CURRENCY' in self.element.get('class', []):
             return FORMAT_CURRENCY_USD_SIMPLE
         if self.data_type() == Cell.TYPE_NUMERIC:
-            return '#,##0.##'
+            try:
+                int(self.value)
+            except ValueError:
+                return '#,##0.##'
+            else:
+                return '#,##0'
 
     def format(self, cell):
         style = self.style()
