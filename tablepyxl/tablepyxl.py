@@ -22,9 +22,12 @@ def write_rows(worksheet, elem, row, column=1):
     initial_column = column
     for table_row in elem.rows:
         for table_cell in table_row.cells:
-            cell = worksheet.cell(row=row, column=column)
-            cell.value = table_cell.element.get_text(separator="\n", strip=True)
-            cell.style = table_cell.style()
+            cell = worksheet.cell(row=row, column=column, value=table_cell.value)
+            style = table_cell.style()
+            cell.font = style.font
+            cell.alignment = style.alignment
+            cell.number_format = style.number_format
+            cell.fill = style.fill
             cell_type = CELL_TYPES & set(table_cell.element.get('class', []))
             if cell_type:
                 cell.data_type = getattr(cell, cell_type.pop())

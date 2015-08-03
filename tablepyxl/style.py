@@ -1,8 +1,10 @@
 # This is where we handle translating css styles into openpyxl styles
 # and cascading those from parent to child in the dom.
 
-from openpyxl.styles import Font, Alignment, PatternFill, Style, fills
-from openpyxl.styles.borders import Border, Side
+from openpyxl.cell import Cell
+from openpyxl.styles import Font, Alignment, PatternFill, Style
+from openpyxl.styles.fills import FILL_SOLID
+from openpyxl.styles.numbers import FORMAT_CURRENCY_USD_SIMPLE
 
 
 def style_string_to_dict(style):
@@ -34,17 +36,13 @@ def style_dict_to_Style(style):
     if bg_color:
         if bg_color.startswith('#'):
             bg_color = bg_color[1:]
-        fill_kwargs = {'fill_type': fills.FILL_SOLID,
+        fill_kwargs = {'fill_type': FILL_SOLID,
                        'start_color': bg_color}
         fill = PatternFill(**fill_kwargs)
     else:
         fill = PatternFill()
 
-    default_side = Side(style='thin', color='AAAAAA')
-    default_border = Border(top=default_side, right=default_side,
-                            bottom=default_side, left=default_side)
-
-    pyxl_style = Style(font=font, fill=fill, border=default_border, alignment=alignment)
+    pyxl_style = Style(font=font, fill=fill, alignment=alignment)
 
     return pyxl_style
 
@@ -131,4 +129,39 @@ class TableRow(Element):
 
 
 class TableCell(Element):
-    pass
+    def __init__(self, *args, **kwargs):
+        super(TableCell, self).__init__(*args, **kwargs)
+        self._raw_value = self.element.get_text(separator="\n", strip=True)
+        self._display_value = None
+        self.data_type = None
+
+    def style(self):
+        self._style_cache = super(TableCell, self).style()
+        if self._raw_value.startswith('$') or self._raw_value.startswith('-$'):
+            self._style_cache.number_format = FORMAT_CURRENCY_USD_SIMPLE
+        elif type(self._display_value) == float or type(self._display_value) == int:
+            self._style_cache.number_format == '#,##0.##'
+        return self._style_cache
+
+    def set_display_value(self):
+        self._display_value = self._raw_value.replace('$', '')
+        try:
+            self._display_value = int(self._display_value)
+            self.data_type = Cell.TYPE_NUMERIC
+        except ValueError:
+            try:
+                self._display_value = float(self._display_value)
+                self.data_type = Cell.TYPE_NUMERIC
+            except ValueError:
+                self._display_value = self._raw_value
+
+    @property
+    def value(self):
+        if not self._display_value:
+            self.set_display_value()
+        return unicode(self._display_value)
+
+    @value.setter
+    def value(self, val):
+        self._raw_value = val
+        self.set_display_value()
