@@ -129,17 +129,21 @@ class TableRow(Element):
 
 
 class TableCell(Element):
-    CELL_TYPES = {'TYPE_STRING', 'TYPE_FORMULA', 'TYPE_NUMERIC', 'TYPE_BOOL',
+    CELL_TYPES = {'TYPE_STRING', 'TYPE_FORMULA', 'TYPE_NUMERIC', 'TYPE_BOOL', 'TYPE_CURRENCY',
                   'TYPE_NULL', 'TYPE_INLINE', 'TYPE_ERROR', 'TYPE_FORMULA_CACHE_STRING'}
 
     def data_type(self):
         cell_type = self.CELL_TYPES & set(self.element.get('class', []))
         if cell_type:
-            return getattr(Cell, cell_type.pop(), Cell.TYPE_STRING)
-        return Cell.TYPE_STRING
+            cell_type = cell_type.pop()
+            if cell_type == 'TYPE_CURRENCY':
+                cell_type = 'TYPE_NUMERIC'
+        else:
+            cell_type = 'TYPE_STRING'
+        return getattr(Cell, cell_type)
 
     def number_format(self):
-        if 'currency' in self.element.get('class', []):
+        if 'TYPE_CURRENCY' in self.element.get('class', []):
             return FORMAT_CURRENCY_USD_SIMPLE
         if self.data_type() == Cell.TYPE_NUMERIC:
             return '#,##0.##'
