@@ -132,6 +132,10 @@ class TableCell(Element):
     CELL_TYPES = {'TYPE_STRING', 'TYPE_FORMULA', 'TYPE_NUMERIC', 'TYPE_BOOL', 'TYPE_CURRENCY',
                   'TYPE_NULL', 'TYPE_INLINE', 'TYPE_ERROR', 'TYPE_FORMULA_CACHE_STRING'}
 
+    def __init__(self, *args, **kwargs):
+        super(TableCell, self).__init__(*args, **kwargs)
+        self.value = self.element.get_text(separator="\n", strip=True)
+
     def data_type(self):
         cell_type = self.CELL_TYPES & set(self.element.get('class', []))
         if cell_type:
@@ -152,7 +156,11 @@ class TableCell(Element):
         style = self.style()
         cell.font = style.font
         cell.alignment = style.alignment
-        cell.number_format = style.number_format
         cell.fill = style.fill
-        cell.data_type = self.data_type()
-        cell._style_cache.number_format = self.number_format()
+        data_type = self.data_type()
+        if data_type:
+            cell.data_type = data_type
+        number_format = self.number_format()
+        if number_format:
+            cell.number_format = number_format
+
