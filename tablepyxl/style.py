@@ -17,34 +17,37 @@ def style_string_to_dict(style):
     return dict(styles)
 
 
+known_styles = {}
+
+
 def style_dict_to_Style(style):
     """
     change css style (stored in a python dictionary) to openpyxl Style
     """
-    # Font
-    font_kwargs = {'bold': style.get('font-weight') == 'bold',
-                   'color': style.get('color', '000000')}
-    font = Font(**font_kwargs)
+    if style not in known_styles:
+        # Font
+        font = Font(bold=style.get('font-weight') == 'bold',
+                    color=style.get('color', '000000'))
 
-    # Alignment
-    alignment_kwargs = {'horizontal': style.get('text-align', 'general'),
-                        'wrap_text': style.get('white-space', 'nowrap') == 'normal'}
-    alignment = Alignment(**alignment_kwargs)
+        # Alignment
+        alignment = Alignment(horizontal=style.get('text-align', 'general'),
+                              wrap_text=style.get('white-space', 'nowrap') == 'normal')
 
-    # Fill
-    bg_color = style.get('background-color')
-    if bg_color:
-        if bg_color.startswith('#'):
-            bg_color = bg_color[1:]
-        fill_kwargs = {'fill_type': FILL_SOLID,
-                       'start_color': bg_color}
-        fill = PatternFill(**fill_kwargs)
-    else:
-        fill = PatternFill()
+        # Fill
+        bg_color = style.get('background-color')
+        if bg_color:
+            if bg_color.startswith('#'):
+                bg_color = bg_color[1:]
+            fill = PatternFill(fill_type=FILL_SOLID,
+                               start_color=bg_color)
+        else:
+            fill = PatternFill()
 
-    pyxl_style = Style(font=font, fill=fill, alignment=alignment)
+        pyxl_style = Style(font=font, fill=fill, alignment=alignment)
 
-    return pyxl_style
+        known_styles[style] = pyxl_style
+
+    return known_styles[style]
 
 
 class StyleDict(dict):
@@ -62,6 +65,14 @@ class StyleDict(dict):
             return self.parent[item]
         else:
             raise KeyError('%s not found' % item)
+
+    def __hash__(self):
+        return hash(tuple([(k, self.get(k)) for k in self._keys()]))
+
+    def _keys(self):
+        if self.parent:
+            return list(set(self.keys() + self.parent._keys()))
+        return self.keys()
 
     def get(self, k, d=None):
         try:
@@ -168,4 +179,3 @@ class TableCell(Element):
         number_format = self.number_format()
         if number_format:
             cell.number_format = number_format
-
