@@ -6,6 +6,8 @@ from openpyxl.styles import Font, Alignment, PatternFill, Style
 from openpyxl.styles.fills import FILL_SOLID
 from openpyxl.styles.numbers import FORMAT_CURRENCY_USD_SIMPLE
 
+FORMAT_DATE_MMDDYYYY = 'mm/dd/yyyy'
+
 
 def style_string_to_dict(style):
     """
@@ -160,6 +162,8 @@ class TableCell(Element):
     def number_format(self):
         if 'TYPE_CURRENCY' in self.element.get('class', []):
             return FORMAT_CURRENCY_USD_SIMPLE
+        if 'TYPE_DATE' in self.element.get('class', []):
+            return FORMAT_DATE_MMDDYYYY
         if self.data_type() == Cell.TYPE_NUMERIC:
             try:
                 int(self.value)
