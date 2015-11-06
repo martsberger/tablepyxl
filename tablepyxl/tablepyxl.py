@@ -20,8 +20,8 @@ def write_rows(worksheet, elem, row, column=1):
         for table_cell in table_row.cells:
             cell = worksheet.cell(row=row, column=column, value=table_cell.value)
             table_cell.format(cell)
-            if worksheet.column_dimensions.values()[column - 1].width < len(cell.value) + 2:
-                worksheet.column_dimensions.values()[column - 1].width = len(cell.value) + 2
+            if worksheet.column_dimensions[get_column_letter(column)].width < len(cell.value) + 2:
+                worksheet.column_dimensions[get_column_letter(column)].width = len(cell.value) + 2
             column += 1
         row += 1
         column = initial_column
