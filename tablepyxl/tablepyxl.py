@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup as BS
 from openpyxl import Workbook
+from openpyxl.cell import get_column_letter
 from premailer import Premailer
 from style import Table
 
