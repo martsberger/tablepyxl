@@ -5,8 +5,17 @@ from openpyxl.cell import Cell
 from openpyxl.styles import Font, Alignment, PatternFill, Style, Border, Side
 from openpyxl.styles.fills import FILL_SOLID
 from openpyxl.styles.numbers import FORMAT_CURRENCY_USD_SIMPLE
+from openpyxl.styles.colors import BLACK
 
 FORMAT_DATE_MMDDYYYY = 'mm/dd/yyyy'
+
+
+def colormap(color):
+    """
+    Convenience for looking up known colors
+    """
+    cmap = {'black': BLACK}
+    return cmap.get(color, color)
 
 
 def style_string_to_dict(style):
@@ -50,7 +59,7 @@ def style_dict_to_Style(style):
         border = Border(left=Side(),
                         right=Side(),
                         top=Side(border_style=style.get('border-top-style'),
-                                 color=style.get('border-top-color')),
+                                 color=colormap(style.get('border-top-color'))),
                         bottom=Side(),
                         diagonal=Side(),
                         diagonal_direction=Side(),
