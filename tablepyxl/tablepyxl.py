@@ -24,21 +24,19 @@ def write_rows(worksheet, elem, row, column=1):
     """
     initial_column = column
     for table_row in elem.rows:
-        max_rowspan = 1
         for table_cell in table_row.cells:
             colspan = string_to_int(table_cell.element.get("colspan", "1"))
             rowspan = string_to_int(table_cell.element.get("rowspan", "1"))
             if rowspan > 1 or colspan > 1:
                 worksheet.merge_cells(start_row=row, start_column=column,
                                       end_row=row + rowspan - 1, end_column=column + colspan - 1)
-                max_rowspan = max(max_rowspan, rowspan)
             cell = worksheet.cell(row=row, column=column, value=table_cell.value)
             table_cell.format(cell)
             min_width = table_cell.get_style('min-width') or len(cell.value) + 2
             if worksheet.column_dimensions[get_column_letter(column)].width < min_width:
                 worksheet.column_dimensions[get_column_letter(column)].width = min_width
             column += colspan
-        row += max_rowspan
+        row += 1
         column = initial_column
     return row
 

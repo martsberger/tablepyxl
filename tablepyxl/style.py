@@ -2,7 +2,7 @@
 # and cascading those from parent to child in the dom.
 
 from openpyxl.cell import Cell
-from openpyxl.styles import Font, Alignment, PatternFill, Style
+from openpyxl.styles import Font, Alignment, PatternFill, Style, Border, Side
 from openpyxl.styles.fills import FILL_SOLID
 from openpyxl.styles.numbers import FORMAT_CURRENCY_USD_SIMPLE
 
@@ -33,6 +33,7 @@ def style_dict_to_Style(style):
 
         # Alignment
         alignment = Alignment(horizontal=style.get('text-align', 'general'),
+                              vertical=style.get('vertical-align'),
                               wrap_text=style.get('white-space', 'nowrap') == 'normal')
 
         # Fill
@@ -44,6 +45,18 @@ def style_dict_to_Style(style):
                                start_color=bg_color)
         else:
             fill = PatternFill()
+
+        # Border
+        border = Border(left=Side(),
+                        right=Side(),
+                        top=Side(border_style=style.get('border-top-style'),
+                                 color=style.get('border-top-color')),
+                        bottom=Side(),
+                        diagonal=Side(),
+                        diagonal_direction=Side(),
+                        outline=Side(),
+                        vertical=Side(),
+                        horizontal=Side())
 
         pyxl_style = Style(font=font, fill=fill, alignment=alignment)
 
