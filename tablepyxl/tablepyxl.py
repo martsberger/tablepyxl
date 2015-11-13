@@ -34,8 +34,9 @@ def write_rows(worksheet, elem, row, column=1):
                 max_rowspan = max(max_rowspan, rowspan)
             cell = worksheet.cell(row=row, column=column, value=table_cell.value)
             table_cell.format(cell)
-            if worksheet.column_dimensions[get_column_letter(column)].width < len(cell.value) + 2:
-                worksheet.column_dimensions[get_column_letter(column)].width = len(cell.value) + 2
+            min_width = table_cell.get_style('min-width') or len(cell.value) + 2
+            if worksheet.column_dimensions[get_column_letter(column)].width < min_width:
+                worksheet.column_dimensions[get_column_letter(column)].width = min_width
             column += colspan
         row += max_rowspan
         column = initial_column
