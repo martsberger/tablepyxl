@@ -67,7 +67,7 @@ def style_dict_to_Style(style):
                         vertical=Side(),
                         horizontal=Side())
 
-        pyxl_style = Style(font=font, fill=fill, alignment=alignment)
+        pyxl_style = Style(font=font, fill=fill, alignment=alignment, border=border)
 
         known_styles[style] = pyxl_style
 
@@ -199,6 +199,7 @@ class TableCell(Element):
         cell.font = style.font
         cell.alignment = style.alignment
         cell.fill = style.fill
+        cell.border = style.border
         data_type = self.data_type()
         if data_type:
             cell.data_type = data_type
