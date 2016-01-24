@@ -1,14 +1,15 @@
 import unittest
 
 import sys
+print "path", sys.path
 from openpyxl import Workbook
-from openpyxl.styles import Font, Style, Alignment, Border, Side, PatternFill
+from openpyxl.styles import Font, Style, Alignment, PatternFill
 from openpyxl.styles.fills import FILL_SOLID
-from tablepyxl.tablepyxl import string_to_int, get_Tables, document_to_workbook, insert_table_at_cell
+from tablepyxl.tablepyxl import string_to_int, get_Tables, document_to_workbook, insert_table_at_cell, table_to_sheet
+# from tablepyxl import string_to_int, get_Tables, document_to_workbook, insert_table_at_cell, table_to_sheet
 
 sys.path.append(".")
 
-from tablepyxl import tablepyxl
 from tablepyxl.style import style_string_to_dict, style_dict_to_Style, StyleDict
 
 
@@ -69,7 +70,7 @@ class TestTablepyxl(unittest.TestCase):
     def test_table_to_sheet(self):
         wb = Workbook()
         table = get_Tables(table_one)
-        tablepyxl.table_to_sheet(table[0], wb)
+        table_to_sheet(table[0], wb)
 
         sheet = wb.get_sheet_by_name('simple table')
         self.assertEqual(sheet.cell('A1').value, 'A cell')
