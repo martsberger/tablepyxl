@@ -66,8 +66,8 @@ Tablepyxl intends to support all of the style and formatting options supported b
 currently supported styles:
 
 ### Font
-* bold via the font-weight style, e.g. <td style="font-weight:bold;">
-* color via the color style, e.g. <td style="color:ff0000">
+* bold via the font-weight style, e.g. `<td style="font-weight:bold;">`
+* color via the color style, e.g. `<td style="color:ff0000">`
 
 ### Alignment
 * horizontal via the text-align style
