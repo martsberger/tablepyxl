@@ -6,7 +6,7 @@ from openpyxl.styles import Font, Style, Alignment, Border, Side, PatternFill
 from openpyxl.styles.fills import FILL_SOLID
 from tablepyxl.tablepyxl import string_to_int, get_Tables, document_to_workbook, insert_table_at_cell
 
-sys.path.append("/Users/brad/projects/tablepyxl")
+sys.path.append(".")
 
 from tablepyxl import tablepyxl
 from tablepyxl.style import style_string_to_dict, style_dict_to_Style, StyleDict
