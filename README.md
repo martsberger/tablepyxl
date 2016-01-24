@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Openpyxl is a bridge between html tables and [openpyxl](http://openpyxl.readthedocs.org/en/default/).
+Tablepyxl is a bridge between html tables and [openpyxl](http://openpyxl.readthedocs.org/en/default/).
 If you can make an html table, you can make an Excel workbook.
 
 ## Usage
