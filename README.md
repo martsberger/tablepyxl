@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/martsberger/tablepyxl.svg?branch=master)](https://travis-ci.org/martsberger/tablepyxl)
+
 # tablepyxl - A python library to convert html tables to Excel
 
 ## Introduction
