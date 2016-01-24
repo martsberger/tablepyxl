@@ -1,7 +1,7 @@
 import unittest
 
 import sys
-sys.path.append("/home/travis/build/martsberger/tablepyxl")
+sys.path.append(".")
 print "path", sys.path
 from openpyxl import Workbook
 from openpyxl.styles import Font, Style, Alignment, PatternFill

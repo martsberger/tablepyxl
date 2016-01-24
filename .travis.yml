@@ -4,6 +4,4 @@ python:
 install:
     - "pip install -r requirements.txt"
 script:
-    - "pwd"
-    - "ls"
     - "python tests/tests.py"
