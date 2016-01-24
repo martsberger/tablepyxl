@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup as BS
 from openpyxl import Workbook
 from openpyxl.cell import get_column_letter
+from openpyxl.utils import column_index_from_string
 from premailer import Premailer
 from style import Table
 
@@ -12,7 +13,7 @@ def string_to_int(s):
 
 
 def get_Tables(doc):
-    soup = BS(doc)
+    soup = BS(doc, "lxml")
     return [Table(table) for table in soup.find_all('table')]
 
 
@@ -30,7 +31,8 @@ def write_rows(worksheet, elem, row, column=1):
             if rowspan > 1 or colspan > 1:
                 worksheet.merge_cells(start_row=row, start_column=column,
                                       end_row=row + rowspan - 1, end_column=column + colspan - 1)
-            cell = worksheet.cell(row=row, column=column, value=table_cell.value)
+            cell = worksheet.cell(row=row, column=column)
+            cell.value = table_cell.value
             table_cell.format(cell)
             min_width = table_cell.get_style('min-width') or len(cell.value) + 2
             if worksheet.column_dimensions[get_column_letter(column)].width < min_width:
@@ -59,7 +61,8 @@ def document_to_workbook(doc, wb=None, base_url=None):
     """
     if not wb:
         wb = Workbook()
-    wb.remove_sheet(wb.active)
+        wb.remove_sheet(wb.active)
+
     inline_styles_doc = Premailer(doc, base_url=base_url, remove_classes=False).transform()
     tables = get_Tables(inline_styles_doc)
 
@@ -91,4 +94,4 @@ def insert_table_at_cell(table, cell):
     """
     ws = cell.parent
     column, row = cell.column, cell.row
-    insert_table(table, ws, column, row)
+    insert_table(table, ws, column_index_from_string(column), row)

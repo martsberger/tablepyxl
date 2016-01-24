@@ -62,10 +62,10 @@ def style_dict_to_Style(style):
                                  color=colormap(style.get('border-top-color'))),
                         bottom=Side(),
                         diagonal=Side(),
-                        diagonal_direction=Side(),
+                        diagonal_direction=None,
                         outline=Side(),
-                        vertical=Side(),
-                        horizontal=Side())
+                        vertical=None,
+                        horizontal=None)
 
         pyxl_style = Style(font=font, fill=fill, alignment=alignment, border=border)
 

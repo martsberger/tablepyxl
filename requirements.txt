@@ -1,0 +1,5 @@
+beautifulsoup4==4.4.0
+lxml==3.4.4
+openpyxl==2.2.3
+premailer==2.9.2
+requests==2.7.0

@@ -9,5 +9,5 @@ setup(
     author_email='bmarts@procuredhealth.com',
     license='MIT',
     packages=find_packages(),
-    install_requires=['openpyxl', 'beautifulsoup4', 'premailer']
+    install_requires=['openpyxl', 'beautifulsoup4', 'premailer', 'requests', 'lxml']
 )
