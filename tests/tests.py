@@ -8,7 +8,7 @@ from openpyxl.styles.fills import FILL_SOLID
 from tablepyxl.tablepyxl import string_to_int, get_Tables, document_to_workbook, insert_table_at_cell, table_to_sheet
 # from tablepyxl import string_to_int, get_Tables, document_to_workbook, insert_table_at_cell, table_to_sheet
 
-sys.path.append(".")
+sys.path.append("/home/travis/build/martsberger/tablepyxl")
 
 from tablepyxl.style import style_string_to_dict, style_dict_to_Style, StyleDict
 
