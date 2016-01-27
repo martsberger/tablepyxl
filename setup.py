@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='tablepyxl',
-    version='0.3',
+    version='0.3.1',
     description='Generate Excel documents from html tables',
     url='https://github.com/martsberger/tablepyxl',
     author='Brad Martsberger',
