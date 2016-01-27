@@ -1,7 +1,7 @@
 import unittest
-
 import sys
 sys.path.append(".")
+
 from openpyxl import Workbook
 from openpyxl.styles import Font, Style, Alignment, PatternFill
 from openpyxl.styles.fills import FILL_SOLID
