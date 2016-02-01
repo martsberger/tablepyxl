@@ -93,10 +93,19 @@ class StyleDict(dict):
     def __hash__(self):
         return hash(tuple([(k, self.get(k)) for k in self._keys()]))
 
+    # Yielding the keys avoids creating unnecessary data structures
+    # and happily works with both python2 and python3 where the
+    # .keys() method is a dictionary_view in python3 and a list in python2.
     def _keys(self):
+        yielded = set()
+        for k in self.keys():
+            yielded.add(k)
+            yield k
         if self.parent:
-            return list(set(self.keys() + self.parent._keys()))
-        return self.keys()
+            for k in self.parent._keys():
+                if k not in yielded:
+                    yielded.add(k)
+                    yield k
 
     def get(self, k, d=None):
         try:

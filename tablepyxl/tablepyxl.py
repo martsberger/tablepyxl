@@ -1,9 +1,12 @@
+# Do imports like python3 so our package works for 2 and 3
+from __future__ import absolute_import
+
 from bs4 import BeautifulSoup as BS
 from openpyxl import Workbook
 from openpyxl.cell import get_column_letter
 from openpyxl.utils import column_index_from_string
 from premailer import Premailer
-from style import Table
+from tablepyxl.style import Table
 
 
 def string_to_int(s):
@@ -35,7 +38,8 @@ def write_rows(worksheet, elem, row, column=1):
             cell.value = table_cell.value
             table_cell.format(cell)
             min_width = table_cell.get_style('min-width') or len(cell.value) + 2
-            if worksheet.column_dimensions[get_column_letter(column)].width < min_width:
+            width = worksheet.column_dimensions[get_column_letter(column)].width
+            if not width or width < min_width:
                 worksheet.column_dimensions[get_column_letter(column)].width = min_width
             column += colspan
         row += 1

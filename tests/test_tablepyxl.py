@@ -157,5 +157,13 @@ class TestStyle(unittest.TestCase):
         self.assertEqual(child.get('parent'), 'mother')
         self.assertEqual(sorted(child._keys()), ['child', 'parent'])
 
+        # We should get the definition of child from the child
+        # not the parent and child should show up only once in the keys
+        parent = StyleDict({'parent': 'mother', 'child': 'son'})
+        child = StyleDict({'child': 'daughter'}, parent=parent)
+        self.assertEqual(child.get('parent'), 'mother')
+        self.assertEqual(child.get('child'), 'daughter')
+        self.assertEqual(sorted(child._keys()), ['child', 'parent'])
+
 if __name__ == "__main__":
     unittest.main()
