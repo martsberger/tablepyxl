@@ -28,6 +28,10 @@ def style_string_to_dict(style):
     return dict(styles)
 
 
+def get_side(style, name):
+    return {'border_style': style.get('border-{}-style'.format(name)),
+            'color': colormap(style.get('border-{}-color'.format(name)))}
+
 known_styles = {}
 
 
@@ -56,14 +60,13 @@ def style_dict_to_Style(style):
             fill = PatternFill()
 
         # Border
-        border = Border(left=Side(),
-                        right=Side(),
-                        top=Side(border_style=style.get('border-top-style'),
-                                 color=colormap(style.get('border-top-color'))),
-                        bottom=Side(),
-                        diagonal=Side(),
+        border = Border(left=Side(**get_side(style, 'left')),
+                        right=Side(**get_side(style, 'right')),
+                        top=Side(**get_side(style, 'top')),
+                        bottom=Side(**get_side(style, 'bottom')),
+                        diagonal=Side(**get_side(style, 'diagonal')),
                         diagonal_direction=None,
-                        outline=Side(),
+                        outline=Side(**get_side(style, 'outline')),
                         vertical=None,
                         horizontal=None)
 
