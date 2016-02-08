@@ -2,7 +2,7 @@
 # and cascading those from parent to child in the dom.
 
 from openpyxl.cell import Cell
-from openpyxl.styles import Font, Alignment, PatternFill, Style, Border, Side
+from openpyxl.styles import Font, Alignment, PatternFill, Style, Border, Side, Color
 from openpyxl.styles.fills import FILL_SOLID
 from openpyxl.styles.numbers import FORMAT_CURRENCY_USD_SIMPLE
 from openpyxl.styles.colors import BLACK
@@ -42,7 +42,8 @@ def style_dict_to_Style(style):
     if style not in known_styles:
         # Font
         font = Font(bold=style.get('font-weight') == 'bold',
-                    color=style.get('color', '000000'))
+                    color=style.get_color('color', '000000'),
+                    size=style.get('font-size'))
 
         # Alignment
         alignment = Alignment(horizontal=style.get('text-align', 'general'),
@@ -50,12 +51,13 @@ def style_dict_to_Style(style):
                               wrap_text=style.get('white-space', 'nowrap') == 'normal')
 
         # Fill
-        bg_color = style.get('background-color')
+        bg_color = style.get_color('background-color')
+        fg_color = style.get_color('foreground-color', Color())
+        fill_type = style.get('fill-type')
         if bg_color:
-            if bg_color.startswith('#'):
-                bg_color = bg_color[1:]
-            fill = PatternFill(fill_type=FILL_SOLID,
-                               start_color=bg_color)
+            fill = PatternFill(fill_type=fill_type or FILL_SOLID,
+                               start_color=bg_color,
+                               end_color=fg_color)
         else:
             fill = PatternFill()
 
@@ -115,6 +117,15 @@ class StyleDict(dict):
             return self[k]
         except KeyError:
             return d
+
+    def get_color(self, k, d=None):
+        """
+        Strip leading # off colors if necessary
+        """
+        color = self.get(k, d)
+        if hasattr(color, 'startswith') and color.startswith('#'):
+            return color[1:]
+        return color
 
 
 class Element(object):
