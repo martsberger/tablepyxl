@@ -2,7 +2,7 @@
 # and cascading those from parent to child in the dom.
 
 from openpyxl.cell import Cell
-from openpyxl.styles import Font, Alignment, PatternFill, Style, Border, Side, Color
+from openpyxl.styles import Font, Alignment, PatternFill, NamedStyle, Border, Side, Color
 from openpyxl.styles.fills import FILL_SOLID
 from openpyxl.styles.numbers import FORMAT_CURRENCY_USD_SIMPLE
 from openpyxl.styles.colors import BLACK
@@ -72,7 +72,7 @@ def style_dict_to_Style(style):
                         vertical=None,
                         horizontal=None)
 
-        pyxl_style = Style(font=font, fill=fill, alignment=alignment, border=border)
+        pyxl_style = NamedStyle(font=font, fill=fill, alignment=alignment, border=border)
 
         known_styles[style] = pyxl_style
 
