@@ -42,7 +42,7 @@ def style_dict_to_Style(style):
     if style not in known_styles:
         # Font
         font = Font(bold=style.get('font-weight') == 'bold',
-                    color=style.get_color('color', '000000'),
+                    color=style.get_color('color', None),
                     size=style.get('font-size'))
 
         # Alignment
