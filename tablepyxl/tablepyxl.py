@@ -38,8 +38,11 @@ def write_rows(worksheet, elem, row, column=1):
             cell.value = table_cell.value
             table_cell.format(cell)
             min_width = table_cell.get_style('min-width') or len(cell.value) + 2
+            max_width = table_cell.get_style('max-width')
             width = worksheet.column_dimensions[get_column_letter(column)].width
-            if not width or width < min_width:
+            if max_width:
+                worksheet.column_dimensions[get_column_letter(column)].width = max_width
+            elif not width or width < min_width:
                 worksheet.column_dimensions[get_column_letter(column)].width = min_width
             column += colspan
         row += 1
