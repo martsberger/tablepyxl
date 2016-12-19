@@ -3,7 +3,7 @@ import sys
 sys.path.append(".")
 
 from openpyxl import Workbook
-from openpyxl.styles import Font, Style, Alignment, PatternFill
+from openpyxl.styles import Font, NamedStyle, Alignment, PatternFill
 from openpyxl.styles.fills import FILL_SOLID
 
 from tablepyxl.tablepyxl import string_to_int, get_Tables, document_to_workbook, insert_table_at_cell, table_to_sheet
@@ -130,24 +130,24 @@ class TestStyle(unittest.TestCase):
 
     def test_style_dict_to_Style(self):
         d = StyleDict({'font-weight': 'bold'})
-        s = Style(font=Font(bold=True),
-                  alignment=Alignment(horizontal='general', vertical=None, wrap_text=False))
+        s = NamedStyle(font=Font(bold=True),
+                       alignment=Alignment(horizontal='general', vertical=None, wrap_text=False))
         self.assertEqual(style_dict_to_Style(d), s)
 
         default_alignment = Alignment(horizontal='general', wrap_text=False)
 
         d = StyleDict({'color': 'ff0000'})
-        s = Style(font=Font(bold=False, color='ff0000'),
-                  alignment=default_alignment)
+        s = NamedStyle(font=Font(bold=False, color='ff0000'),
+                       alignment=default_alignment)
         self.assertEqual(style_dict_to_Style(d), s)
 
         d = StyleDict({'text-align': 'left'})
-        s = Style(alignment=Alignment(horizontal='left', wrap_text=False))
+        s = NamedStyle(alignment=Alignment(horizontal='left', wrap_text=False))
         self.assertEqual(style_dict_to_Style(d), s)
 
         d = StyleDict({'background-color': '#ff0000'})
-        s = Style(fill=PatternFill(fill_type=FILL_SOLID, start_color="ff0000"),
-                  alignment=default_alignment)
+        s = NamedStyle(fill=PatternFill(fill_type=FILL_SOLID, start_color="ff0000"),
+                       alignment=default_alignment)
         self.assertEqual(style_dict_to_Style(d), s)
 
     def test_parent(self):
