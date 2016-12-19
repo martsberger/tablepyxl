@@ -36,10 +36,14 @@ def write_rows(worksheet, elem, row, column=1):
             cell = worksheet.cell(row=row, column=column)
             cell.value = table_cell.value
             table_cell.format(cell)
-            min_width = table_cell.get_style('min-width') or len(cell.value) + 2
-            width = worksheet.column_dimensions[get_column_letter(column)].width
-            if not width or width < min_width:
-                worksheet.column_dimensions[get_column_letter(column)].width = min_width
+            min_width = table_cell.get_style('min-width')
+            max_width = table_cell.get_style('max-width')
+            width = worksheet.column_dimensions[get_column_letter(column)].width or len(cell.value) + 2
+            if max_width and width > max_width:
+                width = max_width
+            elif min_width and width < min_width:
+                width = min_width
+            worksheet.column_dimensions[get_column_letter(column)].width = width
             column += colspan
         row += 1
         column = initial_column
