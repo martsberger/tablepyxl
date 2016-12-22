@@ -35,25 +35,25 @@ def get_side(style, name):
 known_styles = {}
 
 
-def style_dict_to_Style(style):
+def style_dict_to_named_style(style_dict):
     """
-    change css style (stored in a python dictionary) to openpyxl Style
+    Change css style (stored in a python dictionary) to openpyxl NamedStyle
     """
-    if style not in known_styles:
+    if style_dict not in known_styles:
         # Font
-        font = Font(bold=style.get('font-weight') == 'bold',
-                    color=style.get_color('color', None),
-                    size=style.get('font-size'))
+        font = Font(bold=style_dict.get('font-weight') == 'bold',
+                    color=style_dict.get_color('color', None),
+                    size=style_dict.get('font-size'))
 
         # Alignment
-        alignment = Alignment(horizontal=style.get('text-align', 'general'),
-                              vertical=style.get('vertical-align'),
-                              wrap_text=style.get('white-space', 'nowrap') == 'normal')
+        alignment = Alignment(horizontal=style_dict.get('text-align', 'general'),
+                              vertical=style_dict.get('vertical-align'),
+                              wrap_text=style_dict.get('white-space', 'nowrap') == 'normal')
 
         # Fill
-        bg_color = style.get_color('background-color')
-        fg_color = style.get_color('foreground-color', Color())
-        fill_type = style.get('fill-type')
+        bg_color = style_dict.get_color('background-color')
+        fg_color = style_dict.get_color('foreground-color', Color())
+        fill_type = style_dict.get('fill-type')
         if bg_color:
             fill = PatternFill(fill_type=fill_type or FILL_SOLID,
                                start_color=bg_color,
@@ -62,21 +62,21 @@ def style_dict_to_Style(style):
             fill = PatternFill()
 
         # Border
-        border = Border(left=Side(**get_side(style, 'left')),
-                        right=Side(**get_side(style, 'right')),
-                        top=Side(**get_side(style, 'top')),
-                        bottom=Side(**get_side(style, 'bottom')),
-                        diagonal=Side(**get_side(style, 'diagonal')),
+        border = Border(left=Side(**get_side(style_dict, 'left')),
+                        right=Side(**get_side(style_dict, 'right')),
+                        top=Side(**get_side(style_dict, 'top')),
+                        bottom=Side(**get_side(style_dict, 'bottom')),
+                        diagonal=Side(**get_side(style_dict, 'diagonal')),
                         diagonal_direction=None,
-                        outline=Side(**get_side(style, 'outline')),
+                        outline=Side(**get_side(style_dict, 'outline')),
                         vertical=None,
                         horizontal=None)
 
-        pyxl_style = NamedStyle(font=font, fill=fill, alignment=alignment, border=border)
+        pyxl_style = NamedStyle(name=str(style_dict), font=font, fill=fill, alignment=alignment, border=border)
 
-        known_styles[style] = pyxl_style
+        known_styles[style_dict] = pyxl_style
 
-    return known_styles[style]
+    return known_styles[style_dict]
 
 
 class StyleDict(dict):
@@ -93,7 +93,7 @@ class StyleDict(dict):
         elif self.parent:
             return self.parent[item]
         else:
-            raise KeyError('%s not found' % item)
+            raise KeyError('{} not found'.format(item))
 
     def __hash__(self):
         return hash(tuple([(k, self.get(k)) for k in self._keys()]))
@@ -140,25 +140,33 @@ class Element(object):
         self.style_dict = StyleDict(style_string_to_dict(element.get('style', '')), parent=parent_style)
         self._style_cache = None
 
-    # TODO: This method is probably not necessary since we implemented StyleDict
-    def get_style(self, key):
-        return self.style_dict.get(key)
-
     def style(self):
         """
-        Turn the css styles for this element into an openpyxl Style
+        Turn the css styles for this element into an openpyxl NamedStyle.
         """
         if not self._style_cache:
-            self._style_cache = style_dict_to_Style(self.style_dict)
+            self._style_cache = style_dict_to_named_style(self.style_dict)
         return self._style_cache
 
+    def get_dimension(self, dimension_key):
+        """
+        Extracts the dimension from the style dict of the Element and returns it as a float.
+        """
+        dimension = self.style_dict.get(dimension_key)
+        if dimension:
+            if dimension[-2:] in ['px', 'em', 'pt', 'in', 'cm']:
+                dimension = dimension[:-2]
+            dimension = float(dimension)
+        return dimension
 
-# The concrete implementations of Elements are semantically named for
-# the types of elements we are interested in. This defines a very
-# concrete tree structure for html tables that we expect to deal with.
-# I prefer this compared to allowing Element to have an abitrary number
-# of children and dealing with an abstract element tree.
+
 class Table(Element):
+    """
+    The concrete implementations of Elements are semantically named for the types of elements we are interested in.
+    This defines a very concrete tree structure for html tables that we expect to deal with. I prefer this compared to
+    allowing Element to have an arbitrary number of children and dealing with an abstract element tree.
+
+    """
     def __init__(self, table):
         """
         takes an html table object (from BeautifulSoup)
@@ -169,24 +177,36 @@ class Table(Element):
 
 
 class TableHead(Element):
+    """
+    This class maps to the `<th>` element of the html table.
+    """
     def __init__(self, head, parent=None):
         super(TableHead, self).__init__(head, parent=parent)
         self.rows = [TableRow(tr, parent=self) for tr in head.find_all('tr')]
 
 
 class TableBody(Element):
+    """
+    This class maps to the `<tbody>` element of the html table.
+    """
     def __init__(self, body, parent=None):
         super(TableBody, self).__init__(body, parent=parent)
         self.rows = [TableRow(tr, parent=self) for tr in body.find_all('tr')]
 
 
 class TableRow(Element):
+    """
+    This class maps to the `<tr>` element of the html table.
+    """
     def __init__(self, tr, parent=None):
         super(TableRow, self).__init__(tr, parent=parent)
         self.cells = [TableCell(cell, parent=self) for cell in tr.find_all('th') + tr.find_all('td')]
 
 
 class TableCell(Element):
+    """
+    This class maps to the `<td>` element of the html table.
+    """
     CELL_TYPES = {'TYPE_STRING', 'TYPE_FORMULA', 'TYPE_NUMERIC', 'TYPE_BOOL', 'TYPE_CURRENCY',
                   'TYPE_NULL', 'TYPE_INLINE', 'TYPE_ERROR', 'TYPE_FORMULA_CACHE_STRING'}
 
