@@ -7,7 +7,7 @@ from openpyxl.styles import Font, NamedStyle, Alignment, PatternFill
 from openpyxl.styles.fills import FILL_SOLID
 
 from tablepyxl.tablepyxl import string_to_int, get_Tables, document_to_workbook, insert_table_at_cell, table_to_sheet
-from tablepyxl.style import style_string_to_dict, style_dict_to_Style, StyleDict
+from tablepyxl.style import style_string_to_dict, style_dict_to_named_style, StyleDict
 
 
 table_one = "<table name='simple table'> " \
@@ -69,16 +69,16 @@ class TestTablepyxl(unittest.TestCase):
         table = get_Tables(table_one)
         table_to_sheet(table[0], wb)
 
-        sheet = wb.get_sheet_by_name('simple table')
-        self.assertEqual(sheet.cell('A1').value, 'A cell')
+        sheet = wb['simple table']  # Get sheet with the title `simple table`
+        self.assertEqual(sheet['A1'].value, 'A cell')
 
     def test_document_to_workbook(self):
         doc = table_one + table_two
         wb = document_to_workbook(doc)
         self.assertEqual(wb.sheetnames, ['simple table', 'second table'])
 
-        sheet = wb.get_sheet_by_name('second table')
-        self.assertEqual(sheet.cell('B1').value, 'B1 cell')
+        sheet = wb['second table']  # Get sheet with the title `span table`
+        self.assertEqual(sheet['B1'].value, 'B1 cell')
 
         # Add another sheet to the existing workbook
         wb = document_to_workbook(table_three, wb=wb)
@@ -87,19 +87,19 @@ class TestTablepyxl(unittest.TestCase):
     def test_spans(self):
         doc = table_span
         wb = document_to_workbook(doc)
-        sheet = wb.get_sheet_by_name('span table')
+        sheet = wb['span table']  # Get sheet with the title `span table`
         self.assertIn("A1:C1", sheet.merged_cell_ranges)
         self.assertIn("A2:A5", sheet.merged_cell_ranges)
 
     def test_insert_table_at_cell(self):
         wb = Workbook()
         ws = wb.active
-        cell = ws.cell('B2')
+        cell = ws['B2']
 
         table = get_Tables(table_one)
         insert_table_at_cell(table[0], cell)
 
-        self.assertEqual(ws.cell('B2').value, 'A cell')
+        self.assertEqual(ws['B2'].value, 'A cell')
 
 
 class TestStyle(unittest.TestCase):
@@ -128,27 +128,27 @@ class TestStyle(unittest.TestCase):
         d = {'partially': 'valid'}
         self.assertEqual(d, style_string_to_dict(string))
 
-    def test_style_dict_to_Style(self):
+    def test_style_dict_to_style(self):
         d = StyleDict({'font-weight': 'bold'})
-        s = NamedStyle(font=Font(bold=True),
+        s = NamedStyle(name=str(d), font=Font(bold=True),
                        alignment=Alignment(horizontal='general', vertical=None, wrap_text=False))
-        self.assertEqual(style_dict_to_Style(d), s)
+        self.assertEqual(style_dict_to_named_style(d), s)
 
         default_alignment = Alignment(horizontal='general', wrap_text=False)
 
         d = StyleDict({'color': 'ff0000'})
-        s = NamedStyle(font=Font(bold=False, color='ff0000'),
+        s = NamedStyle(name=str(d), font=Font(bold=False, color='ff0000'),
                        alignment=default_alignment)
-        self.assertEqual(style_dict_to_Style(d), s)
+        self.assertEqual(style_dict_to_named_style(d), s)
 
         d = StyleDict({'text-align': 'left'})
-        s = NamedStyle(alignment=Alignment(horizontal='left', wrap_text=False))
-        self.assertEqual(style_dict_to_Style(d), s)
+        s = NamedStyle(name=str(d), alignment=Alignment(horizontal='left', wrap_text=False))
+        self.assertEqual(style_dict_to_named_style(d), s)
 
         d = StyleDict({'background-color': '#ff0000'})
-        s = NamedStyle(fill=PatternFill(fill_type=FILL_SOLID, start_color="ff0000"),
+        s = NamedStyle(name=str(d), fill=PatternFill(fill_type=FILL_SOLID, start_color="ff0000"),
                        alignment=default_alignment)
-        self.assertEqual(style_dict_to_Style(d), s)
+        self.assertEqual(style_dict_to_named_style(d), s)
 
     def test_parent(self):
         parent = StyleDict({'parent': 'mother'})
