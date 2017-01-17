@@ -14,6 +14,8 @@ table_one = "<table name='simple table'> " \
             "<tbody> " \
             "<tr> " \
             "<td>A cell</td> " \
+            "<td>=1+2</td> " \
+            "<td class='TYPE_FORMULA TYPE_INTEGER'>=1+2</td> " \
             "</tr> " \
             "</tbody> " \
             "</table>"
@@ -71,6 +73,12 @@ class TestTablepyxl(unittest.TestCase):
 
         sheet = wb['simple table']  # Get sheet with the title `simple table`
         self.assertEqual(sheet['A1'].value, 'A cell')
+        self.assertEqual(sheet['B1'].value, '=1+2')
+        self.assertEqual(sheet['B1'].data_type, 's')
+        self.assertEqual(sheet['B1'].number_format, 'General')
+        self.assertEqual(sheet['C1'].value, '=1+2')
+        self.assertEqual(sheet['C1'].data_type, 'f')
+        self.assertEqual(sheet['C1'].number_format, '#,##0')
 
     def test_document_to_workbook(self):
         doc = table_one + table_two
