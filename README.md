@@ -93,6 +93,7 @@ Cell types can be set by adding any of the following classes to the td element:
 * TYPE_INLINE
 * TYPE_ERROR
 * TYPE_FORMULA_CACHE_STRING
+* TYPE_INTEGER
 
 ### Number formatting
 * Currency is formatted using FORMAT_CURRENCY_USD_SIMPLE
