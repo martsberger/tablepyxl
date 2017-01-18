@@ -208,18 +208,22 @@ class TableCell(Element):
     This class maps to the `<td>` element of the html table.
     """
     CELL_TYPES = {'TYPE_STRING', 'TYPE_FORMULA', 'TYPE_NUMERIC', 'TYPE_BOOL', 'TYPE_CURRENCY',
-                  'TYPE_NULL', 'TYPE_INLINE', 'TYPE_ERROR', 'TYPE_FORMULA_CACHE_STRING'}
+                  'TYPE_NULL', 'TYPE_INLINE', 'TYPE_ERROR', 'TYPE_FORMULA_CACHE_STRING', 'TYPE_INTEGER'}
 
     def __init__(self, *args, **kwargs):
         super(TableCell, self).__init__(*args, **kwargs)
         self.value = self.element.get_text(separator="\n", strip=True)
 
     def data_type(self):
-        cell_type = self.CELL_TYPES & set(self.element.get('class', []))
-        if cell_type:
-            cell_type = cell_type.pop()
-            if cell_type == 'TYPE_CURRENCY':
+        cell_types = self.CELL_TYPES & set(self.element.get('class', []))
+        if cell_types:
+            if 'TYPE_FORMULA' in cell_types:
+                # Make sure TYPE_FORMULA takes precedence over the other classes in the set.
+                cell_type = 'TYPE_FORMULA'
+            elif 'TYPE_CURRENCY' in cell_types or 'TYPE_INTEGER' in cell_types:
                 cell_type = 'TYPE_NUMERIC'
+            else:
+                cell_type = cell_types.pop()
         else:
             cell_type = 'TYPE_STRING'
         return getattr(Cell, cell_type)
@@ -227,6 +231,8 @@ class TableCell(Element):
     def number_format(self):
         if 'TYPE_CURRENCY' in self.element.get('class', []):
             return FORMAT_CURRENCY_USD_SIMPLE
+        if 'TYPE_INTEGER' in self.element.get('class', []):
+            return '#,##0'
         if 'TYPE_DATE' in self.element.get('class', []):
             return FORMAT_DATE_MMDDYYYY
         if self.data_type() == Cell.TYPE_NUMERIC:
