@@ -41,10 +41,10 @@ table_three = "<table name='Another simple table'><thead></thead> " \
 table_span = "<table name='span table'><thead></thead> " \
              "<tbody> " \
              "<tr> " \
-             "<td colspan=3>A1 through C1 cell</td> " \
+             "<td colspan='3'>A1 through C1 cell</td> " \
              "</tr> " \
              "<tr> " \
-             "<td rowspan=4>A2 through A5 cell</td> " \
+             "<td rowspan='4'>A2 through A5 cell</td> " \
              "</tr> " \
              "</tbody> " \
              "</table>"
@@ -55,7 +55,7 @@ table_widths = "<table name='width table'><thead></thead> " \
                "<td>12</td> " \
                "</tr> " \
                "<tr> " \
-               "<td colspan=2>123456789</td> " \
+               "<td colspan='2'>123456789</td> " \
                "</tr> " \
                "<tr> " \
                "<td>1234</td> " \
