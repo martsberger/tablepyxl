@@ -124,7 +124,9 @@ class StyleDict(dict):
         """
         color = self.get(k, d)
         if hasattr(color, 'startswith') and color.startswith('#'):
-            return color[1:]
+            color = color[1:]
+            if len(color) == 3:  # Premailers reduces colors like #00ff00 to #0f0, openpyxl doesn't like that
+                color = ''.join(2 * c for c in color)
         return color
 
 
