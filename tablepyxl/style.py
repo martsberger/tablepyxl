@@ -244,11 +244,7 @@ class TableCell(Element):
                 return '#,##0'
 
     def format(self, cell):
-        style = self.style()
-        cell.font = style.font
-        cell.alignment = style.alignment
-        cell.fill = style.fill
-        cell.border = style.border
+        cell.style = self.style()
         data_type = self.data_type()
         if data_type:
             cell.data_type = data_type
