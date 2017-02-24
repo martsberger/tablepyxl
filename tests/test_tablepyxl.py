@@ -163,6 +163,7 @@ class TestStyle(unittest.TestCase):
         def get_name(d):
             return str({
                 'style_dict': d,
+                'parent': d.parent,
                 'number_format': None,
             })
 

@@ -42,6 +42,7 @@ def style_dict_to_named_style(style_dict, number_format=None):
 
     style_and_format_string = str({
         'style_dict': style_dict,
+        'parent': style_dict.parent,
         'number_format': number_format,
     })
 
@@ -215,9 +216,9 @@ class TableCell(Element):
     CELL_TYPES = {'TYPE_STRING', 'TYPE_FORMULA', 'TYPE_NUMERIC', 'TYPE_BOOL', 'TYPE_CURRENCY',
                   'TYPE_NULL', 'TYPE_INLINE', 'TYPE_ERROR', 'TYPE_FORMULA_CACHE_STRING', 'TYPE_INTEGER'}
 
-    def __init__(self, cell, parent):
+    def __init__(self, cell, parent=None):
+        super(TableCell, self).__init__(cell, parent=parent)
         self.value = cell.get_text(separator="\n", strip=True)
-        super(TableCell, self).__init__(cell, parent)
         self.number_format = self.get_number_format()
 
     def data_type(self):
