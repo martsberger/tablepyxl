@@ -79,7 +79,9 @@ def style_dict_to_named_style(style_dict, number_format=None):
                         vertical=None,
                         horizontal=None)
 
-        pyxl_style = NamedStyle(name=style_and_format_string, font=font, fill=fill, alignment=alignment, border=border,
+        name = 'Style {}'.format(len(known_styles) + 1)
+
+        pyxl_style = NamedStyle(name=name, font=font, fill=fill, alignment=alignment, border=border,
                                 number_format=number_format)
 
         known_styles[style_and_format_string] = pyxl_style
