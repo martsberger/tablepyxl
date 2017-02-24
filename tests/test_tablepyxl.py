@@ -160,24 +160,32 @@ class TestStyle(unittest.TestCase):
         self.assertEqual(d, style_string_to_dict(string))
 
     def test_style_dict_to_style(self):
+        def get_name(d):
+            return str({
+                'style_dict': d,
+                'number_format': None,
+            })
+
         d = StyleDict({'font-weight': 'bold'})
-        s = NamedStyle(name=str(d), font=Font(bold=True),
+        s = NamedStyle(name=get_name(d), font=Font(bold=True),
                        alignment=Alignment(horizontal='general', vertical=None, wrap_text=False))
         self.assertEqual(style_dict_to_named_style(d), s)
 
         default_alignment = Alignment(horizontal='general', wrap_text=False)
 
         d = StyleDict({'color': 'ff0000'})
-        s = NamedStyle(name=str(d), font=Font(bold=False, color='ff0000'),
+        s = NamedStyle(name=get_name(d), font=Font(bold=False, color='ff0000'),
                        alignment=default_alignment)
+
         self.assertEqual(style_dict_to_named_style(d), s)
 
         d = StyleDict({'text-align': 'left'})
-        s = NamedStyle(name=str(d), alignment=Alignment(horizontal='left', wrap_text=False))
+        s = NamedStyle(name=get_name(d), alignment=Alignment(horizontal='left', wrap_text=False))
+
         self.assertEqual(style_dict_to_named_style(d), s)
 
         d = StyleDict({'background-color': '#ff0000'})
-        s = NamedStyle(name=str(d), fill=PatternFill(fill_type=FILL_SOLID, start_color="ff0000"),
+        s = NamedStyle(name=get_name(d), fill=PatternFill(fill_type=FILL_SOLID, start_color="ff0000"),
                        alignment=default_alignment)
         self.assertEqual(style_dict_to_named_style(d), s)
 

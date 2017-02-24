@@ -35,11 +35,17 @@ def get_side(style, name):
 known_styles = {}
 
 
-def style_dict_to_named_style(style_dict):
+def style_dict_to_named_style(style_dict, number_format=None):
     """
     Change css style (stored in a python dictionary) to openpyxl NamedStyle
     """
-    if style_dict not in known_styles:
+
+    style_and_format_string = str({
+        'style_dict': style_dict,
+        'number_format': number_format,
+    })
+
+    if style_and_format_string not in known_styles:
         # Font
         font = Font(bold=style_dict.get('font-weight') == 'bold',
                     color=style_dict.get_color('color', None),
@@ -72,11 +78,12 @@ def style_dict_to_named_style(style_dict):
                         vertical=None,
                         horizontal=None)
 
-        pyxl_style = NamedStyle(name=str(style_dict), font=font, fill=fill, alignment=alignment, border=border)
+        pyxl_style = NamedStyle(name=style_and_format_string, font=font, fill=fill, alignment=alignment, border=border,
+                                number_format=number_format)
 
-        known_styles[style_dict] = pyxl_style
+        known_styles[style_and_format_string] = pyxl_style
 
-    return known_styles[style_dict]
+    return known_styles[style_and_format_string]
 
 
 class StyleDict(dict):
@@ -136,17 +143,15 @@ class Element(object):
     """
     def __init__(self, element, parent=None):
         self.element = element
+        self.number_format = None
         parent_style = parent.style_dict if parent else None
         self.style_dict = StyleDict(style_string_to_dict(element.get('style', '')), parent=parent_style)
-        self._style_cache = None
 
     def style(self):
         """
         Turn the css styles for this element into an openpyxl NamedStyle.
         """
-        if not self._style_cache:
-            self._style_cache = style_dict_to_named_style(self.style_dict)
-        return self._style_cache
+        return style_dict_to_named_style(self.style_dict, number_format=self.number_format)
 
     def get_dimension(self, dimension_key):
         """
@@ -210,9 +215,10 @@ class TableCell(Element):
     CELL_TYPES = {'TYPE_STRING', 'TYPE_FORMULA', 'TYPE_NUMERIC', 'TYPE_BOOL', 'TYPE_CURRENCY',
                   'TYPE_NULL', 'TYPE_INLINE', 'TYPE_ERROR', 'TYPE_FORMULA_CACHE_STRING', 'TYPE_INTEGER'}
 
-    def __init__(self, *args, **kwargs):
-        super(TableCell, self).__init__(*args, **kwargs)
-        self.value = self.element.get_text(separator="\n", strip=True)
+    def __init__(self, cell, parent):
+        self.value = cell.get_text(separator="\n", strip=True)
+        super(TableCell, self).__init__(cell, parent)
+        self.number_format = self.get_number_format()
 
     def data_type(self):
         cell_types = self.CELL_TYPES & set(self.element.get('class', []))
@@ -228,7 +234,7 @@ class TableCell(Element):
             cell_type = 'TYPE_STRING'
         return getattr(Cell, cell_type)
 
-    def number_format(self):
+    def get_number_format(self):
         if 'TYPE_CURRENCY' in self.element.get('class', []):
             return FORMAT_CURRENCY_USD_SIMPLE
         if 'TYPE_INTEGER' in self.element.get('class', []):
@@ -248,6 +254,3 @@ class TableCell(Element):
         data_type = self.data_type()
         if data_type:
             cell.data_type = data_type
-        number_format = self.number_format()
-        if number_format:
-            cell.number_format = number_format
