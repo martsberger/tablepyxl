@@ -107,3 +107,9 @@ Cell types can be set by adding any of the following classes to the td element:
 ## License
 
 MIT (http://opensource.org/licenses/MIT)
+
+## Contributors
+
+* [amehjabeen](https://github.com/amehjabeen)
+* [bmdavi3](https://github.com/bmdavi3)
+* [scottsexton](https://github.com/scottsexton)
