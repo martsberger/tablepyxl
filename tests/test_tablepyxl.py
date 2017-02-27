@@ -183,6 +183,19 @@ class TestStyle(unittest.TestCase):
                        alignment=default_alignment)
         self.assertEqual(style_dict_to_named_style(d), s)
 
+        # Make sure we reuse a style when it already exists
+        known_styles_length = len(known_styles)
+        d = StyleDict({'background-color': '#ff0000'})
+        style_dict_to_named_style(d)
+        self.assertEqual(len(known_styles), known_styles_length)
+
+        # Create new one when it doesn't
+        known_styles_length = len(known_styles)
+        d = StyleDict({'background-color': '#ff0000', 'class': 'TYPE_NUMERIC'})
+        style_dict_to_named_style(d)
+        self.assertEqual(len(known_styles), known_styles_length + 1)
+
+
     def test_parent(self):
         parent = StyleDict({'parent': 'mother'})
         child = StyleDict({'child': 'daughter'}, parent=parent)
