@@ -156,7 +156,7 @@ class Element(object):
         Turn the css styles for this element into an openpyxl NamedStyle.
         """
         if not self._style_cache:
-            self._style_cache = style_dict_to_named_style(self.style_dict)
+            self._style_cache = style_dict_to_named_style(self.style_dict, number_format=self.number_format)
         return self._style_cache
 
     def get_dimension(self, dimension_key):
