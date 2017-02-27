@@ -149,12 +149,15 @@ class Element(object):
         self.number_format = None
         parent_style = parent.style_dict if parent else None
         self.style_dict = StyleDict(style_string_to_dict(element.get('style', '')), parent=parent_style)
+        self._style_cache = None
 
     def style(self):
         """
         Turn the css styles for this element into an openpyxl NamedStyle.
         """
-        return style_dict_to_named_style(self.style_dict, number_format=self.number_format)
+        if not self._style_cache:
+            self._style_cache = style_dict_to_named_style(self.style_dict)
+        return self._style_cache
 
     def get_dimension(self, dimension_key):
         """
