@@ -225,7 +225,6 @@ class TableCell(Element):
 
     def __init__(self, cell, parent=None):
         super(TableCell, self).__init__(cell, parent=parent)
-        # TODO: Check this behavior
         self.value = cell.text.strip() if cell.text else ''
         self.number_format = self.get_number_format()
 
