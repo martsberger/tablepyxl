@@ -185,8 +185,8 @@ class Table(Element):
         takes an html table object (from BeautifulSoup)
         """
         super(Table, self).__init__(table)
-        self.head = TableHead(table.thead, parent=self) if table.thead else None
-        self.body = TableBody(table.tbody or table, parent=self)
+        self.head = TableHead(table.find('thead'), parent=self) if table.find('thead') else None
+        self.body = TableBody(table.find('tbody') or table, parent=self)
 
 
 class TableHead(Element):
@@ -195,7 +195,7 @@ class TableHead(Element):
     """
     def __init__(self, head, parent=None):
         super(TableHead, self).__init__(head, parent=parent)
-        self.rows = [TableRow(tr, parent=self) for tr in head.find_all('tr')]
+        self.rows = [TableRow(tr, parent=self) for tr in head.findall('tr')]
 
 
 class TableBody(Element):
@@ -204,7 +204,7 @@ class TableBody(Element):
     """
     def __init__(self, body, parent=None):
         super(TableBody, self).__init__(body, parent=parent)
-        self.rows = [TableRow(tr, parent=self) for tr in body.find_all('tr')]
+        self.rows = [TableRow(tr, parent=self) for tr in body.findall('tr')]
 
 
 class TableRow(Element):
@@ -213,7 +213,7 @@ class TableRow(Element):
     """
     def __init__(self, tr, parent=None):
         super(TableRow, self).__init__(tr, parent=parent)
-        self.cells = [TableCell(cell, parent=self) for cell in tr.find_all('th') + tr.find_all('td')]
+        self.cells = [TableCell(cell, parent=self) for cell in tr.findall('th') + tr.findall('td')]
 
 
 class TableCell(Element):
@@ -225,11 +225,12 @@ class TableCell(Element):
 
     def __init__(self, cell, parent=None):
         super(TableCell, self).__init__(cell, parent=parent)
-        self.value = cell.get_text(separator="\n", strip=True)
+        # TODO: Check this behavior
+        self.value = cell.text.strip() if cell.text else ''
         self.number_format = self.get_number_format()
 
     def data_type(self):
-        cell_types = self.CELL_TYPES & set(self.element.get('class', []))
+        cell_types = self.CELL_TYPES & set(self.element.get('class', '').split())
         if cell_types:
             if 'TYPE_FORMULA' in cell_types:
                 # Make sure TYPE_FORMULA takes precedence over the other classes in the set.
@@ -243,11 +244,11 @@ class TableCell(Element):
         return getattr(Cell, cell_type)
 
     def get_number_format(self):
-        if 'TYPE_CURRENCY' in self.element.get('class', []):
+        if 'TYPE_CURRENCY' in self.element.get('class', '').split():
             return FORMAT_CURRENCY_USD_SIMPLE
-        if 'TYPE_INTEGER' in self.element.get('class', []):
+        if 'TYPE_INTEGER' in self.element.get('class', '').split():
             return '#,##0'
-        if 'TYPE_DATE' in self.element.get('class', []):
+        if 'TYPE_DATE' in self.element.get('class', '').split():
             return FORMAT_DATE_MMDDYYYY
         if self.data_type() == Cell.TYPE_NUMERIC:
             try:
