@@ -66,16 +66,14 @@ table_widths = "<table name='width table'><thead></thead> " \
                "</tbody> " \
                "</table>"
 
-table_whitespace = """
-    <table name='whitespace table'>
-        <thead></thead>"
-        <tbody>
-            <tr>
-                <td>   a  bc  <inn1>  d  ef  </inn1>  g  hi   <inn2>   j  k  <inn3>  l  m  </inn3>  n  o  </inn2>  p  </td>
-            </tr>
-        </tbody>
-    </table>
-"""
+table_whitespace = "<table name='whitespace table'>" \
+                   "<thead></thead>" \
+                   "<tbody>" \
+                   "<tr>" \
+                   "<td>   a  bc  <inn1>  d  ef  </inn1>  g  hi   <inn2>   j  k  <inn3>  l  m  </inn3>  n  o  </inn2>  p  </td>" \
+                   "</tr>" \
+                   "</tbody>" \
+                   "</table>"
 
 
 class TestTablepyxl(unittest.TestCase):
