@@ -1,7 +1,7 @@
 # Do imports like python3 so our package works for 2 and 3
 from __future__ import absolute_import
 
-from bs4 import BeautifulSoup as BS
+from lxml import html
 from openpyxl import Workbook
 from openpyxl.utils import column_index_from_string, get_column_letter
 from premailer import Premailer
@@ -15,8 +15,8 @@ def string_to_int(s):
 
 
 def get_Tables(doc):
-    soup = BS(doc, "lxml")
-    return [Table(table) for table in soup.find_all('table')]
+    tree = html.fromstring(doc)
+    return [Table(table) for table in tree.xpath('//table')]
 
 
 def write_rows(worksheet, elem, row, column=1):
