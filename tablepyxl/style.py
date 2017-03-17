@@ -216,6 +216,21 @@ class TableRow(Element):
         self.cells = [TableCell(cell, parent=self) for cell in tr.findall('th') + tr.findall('td')]
 
 
+def element_to_string(el):
+    return _element_to_string(el).strip()
+
+
+def _element_to_string(el):
+    children = el.getchildren()
+
+    string = ''
+
+    for x in children:
+        string += '\n' + element_to_string(x)
+
+    return el.text.strip() + string + '\n' + el.tail.strip()
+
+
 class TableCell(Element):
     """
     This class maps to the `<td>` element of the html table.
@@ -225,7 +240,7 @@ class TableCell(Element):
 
     def __init__(self, cell, parent=None):
         super(TableCell, self).__init__(cell, parent=parent)
-        self.value = cell.text.strip() if cell.text else ''
+        self.value = element_to_string(cell)
         self.number_format = self.get_number_format()
 
     def data_type(self):
