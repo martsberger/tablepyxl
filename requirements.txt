@@ -1,4 +1,4 @@
-lxml==3.4.4
+lxml==3.7.3
 openpyxl==2.4.1
 premailer==2.9.2
 pytest==2.8.7

@@ -16,5 +16,5 @@ setup(
         'Programming Language :: Python :: 3.4'
     ],
     packages=find_packages(),
-    install_requires=['openpyxl', 'beautifulsoup4', 'premailer', 'requests', 'lxml']
+    install_requires=['openpyxl', 'premailer', 'requests', 'lxml']
 )

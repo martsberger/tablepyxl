@@ -182,7 +182,7 @@ class Table(Element):
     """
     def __init__(self, table):
         """
-        takes an html table object (from BeautifulSoup)
+        takes an html table object (from lxml)
         """
         super(Table, self).__init__(table)
         self.head = TableHead(table.find('thead'), parent=self) if table.find('thead') else None
