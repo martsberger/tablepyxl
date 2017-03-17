@@ -221,11 +221,9 @@ def element_to_string(el):
 
 
 def _element_to_string(el):
-    children = el.getchildren()
-
     string = ''
 
-    for x in children:
+    for x in el.iterchildren():
         string += '\n' + element_to_string(x)
 
     text = el.text.strip() if el.text else ''
