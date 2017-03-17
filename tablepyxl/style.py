@@ -224,7 +224,7 @@ def _element_to_string(el):
     string = ''
 
     for x in el.iterchildren():
-        string += '\n' + element_to_string(x)
+        string += '\n' + _element_to_string(x)
 
     text = el.text.strip() if el.text else ''
     tail = el.tail.strip() if el.tail else ''
