@@ -228,7 +228,10 @@ def _element_to_string(el):
     for x in children:
         string += '\n' + element_to_string(x)
 
-    return el.text.strip() + string + '\n' + el.tail.strip()
+    text = el.text.strip() if el.text else ''
+    tail = el.tail.strip() if el.tail else ''
+
+    return text + string + '\n' + tail
 
 
 class TableCell(Element):
