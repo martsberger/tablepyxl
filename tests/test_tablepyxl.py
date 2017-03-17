@@ -66,6 +66,15 @@ table_widths = "<table name='width table'><thead></thead> " \
                "</tbody> " \
                "</table>"
 
+table_whitespace = "<table name='whitespace table'>" \
+                   "<thead></thead>" \
+                   "<tbody>" \
+                   "<tr>" \
+                   "<td>   a  bc  <inn1>  d  ef  </inn1>  g  hi   <inn2>   j  k  <inn3>  l  m  </inn3>  n  o  </inn2>  p  </td>" \
+                   "</tr>" \
+                   "</tbody>" \
+                   "</table>"
+
 
 class TestTablepyxl(unittest.TestCase):
     """
@@ -131,6 +140,13 @@ class TestTablepyxl(unittest.TestCase):
         insert_table_at_cell(table[0], cell)
 
         self.assertEqual(ws['B2'].value, 'A cell')
+
+    def test_element_whitespace(self):
+        doc = table_whitespace
+        wb = document_to_workbook(doc)
+        sheet = wb['whitespace table']
+
+        self.assertEqual(sheet['A1'].value, 'a  bc\nd  ef\ng  hi\nj  k\nl  m\nn  o\np')
 
 
 class TestStyle(unittest.TestCase):
