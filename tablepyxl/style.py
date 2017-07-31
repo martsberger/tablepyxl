@@ -172,8 +172,10 @@ class Table(Element):
         takes an html table object (from BeautifulSoup)
         """
         super(Table, self).__init__(table)
-        self.head = TableHead(table.thead, parent=self) if table.thead else None
-        self.body = TableBody(table.tbody or table, parent=self)
+        table_head = table.find('thead')
+        self.head = TableHead(table_head, parent=self) if len(table_head) else None
+        table_body = table.find('tbody')
+        self.body = TableBody(table_body if len(table_body) else table, parent=self)
 
 
 class TableHead(Element):
