@@ -7,7 +7,7 @@ from openpyxl.styles import Font, NamedStyle, Alignment, PatternFill
 from openpyxl.styles.fills import FILL_SOLID
 
 from tablepyxl.tablepyxl import string_to_int, get_Tables, document_to_workbook, insert_table_at_cell, table_to_sheet
-from tablepyxl.style import style_string_to_dict, style_dict_to_named_style, StyleDict
+from tablepyxl.style import style_string_to_dict, style_dict_to_named_style, StyleDict, known_styles
 
 
 table_one = "<table name='simple table'> " \
@@ -65,6 +65,15 @@ table_widths = "<table name='width table'><thead></thead> " \
                "</tr> " \
                "</tbody> " \
                "</table>"
+
+table_whitespace = "<table name='whitespace table'>" \
+                   "<thead></thead>" \
+                   "<tbody>" \
+                   "<tr>" \
+                   "<td>   a  bc  <inn1>  d  ef  </inn1>  g  hi   <inn2>   j  k  <inn3>  l  m  </inn3>  n  o  </inn2>  p  </td>" \
+                   "</tr>" \
+                   "</tbody>" \
+                   "</table>"
 
 
 class TestTablepyxl(unittest.TestCase):
@@ -132,6 +141,13 @@ class TestTablepyxl(unittest.TestCase):
 
         self.assertEqual(ws['B2'].value, 'A cell')
 
+    def test_element_whitespace(self):
+        doc = table_whitespace
+        wb = document_to_workbook(doc)
+        sheet = wb['whitespace table']
+
+        self.assertEqual(sheet['A1'].value, 'a  bc\nd  ef\ng  hi\nj  k\nl  m\nn  o\np')
+
 
 class TestStyle(unittest.TestCase):
     """
@@ -161,25 +177,40 @@ class TestStyle(unittest.TestCase):
 
     def test_style_dict_to_style(self):
         d = StyleDict({'font-weight': 'bold'})
-        s = NamedStyle(name=str(d), font=Font(bold=True),
+        s = NamedStyle(name='Style {}'.format(len(known_styles) + 1), font=Font(bold=True),
                        alignment=Alignment(horizontal='general', vertical=None, wrap_text=False))
         self.assertEqual(style_dict_to_named_style(d), s)
 
         default_alignment = Alignment(horizontal='general', wrap_text=False)
 
         d = StyleDict({'color': 'ff0000'})
-        s = NamedStyle(name=str(d), font=Font(bold=False, color='ff0000'),
+        s = NamedStyle(name='Style {}'.format(len(known_styles) + 1), font=Font(bold=False, color='ff0000'),
                        alignment=default_alignment)
+
         self.assertEqual(style_dict_to_named_style(d), s)
 
         d = StyleDict({'text-align': 'left'})
-        s = NamedStyle(name=str(d), alignment=Alignment(horizontal='left', wrap_text=False))
+        s = NamedStyle(name='Style {}'.format(len(known_styles) + 1), alignment=Alignment(horizontal='left', wrap_text=False))
+
         self.assertEqual(style_dict_to_named_style(d), s)
 
         d = StyleDict({'background-color': '#ff0000'})
-        s = NamedStyle(name=str(d), fill=PatternFill(fill_type=FILL_SOLID, start_color="ff0000"),
+        s = NamedStyle(name='Style {}'.format(len(known_styles) + 1), fill=PatternFill(fill_type=FILL_SOLID, start_color="ff0000"),
                        alignment=default_alignment)
         self.assertEqual(style_dict_to_named_style(d), s)
+
+        # Make sure we reuse a style when it already exists
+        known_styles_length = len(known_styles)
+        d = StyleDict({'background-color': '#ff0000'})
+        style_dict_to_named_style(d)
+        self.assertEqual(len(known_styles), known_styles_length)
+
+        # Create new one when it doesn't
+        known_styles_length = len(known_styles)
+        d = StyleDict({'background-color': '#ff0000', 'class': 'TYPE_NUMERIC'})
+        style_dict_to_named_style(d)
+        self.assertEqual(len(known_styles), known_styles_length + 1)
+
 
     def test_parent(self):
         parent = StyleDict({'parent': 'mother'})

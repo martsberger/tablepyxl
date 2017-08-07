@@ -35,11 +35,18 @@ def get_side(style, name):
 known_styles = {}
 
 
-def style_dict_to_named_style(style_dict):
+def style_dict_to_named_style(style_dict, number_format=None):
     """
     Change css style (stored in a python dictionary) to openpyxl NamedStyle
     """
-    if style_dict not in known_styles:
+
+    style_and_format_string = str({
+        'style_dict': style_dict,
+        'parent': style_dict.parent,
+        'number_format': number_format,
+    })
+
+    if style_and_format_string not in known_styles:
         # Font
         font = Font(bold=style_dict.get('font-weight') == 'bold',
                     color=style_dict.get_color('color', None),
@@ -72,11 +79,14 @@ def style_dict_to_named_style(style_dict):
                         vertical=None,
                         horizontal=None)
 
-        pyxl_style = NamedStyle(name=str(style_dict), font=font, fill=fill, alignment=alignment, border=border)
+        name = 'Style {}'.format(len(known_styles) + 1)
 
-        known_styles[style_dict] = pyxl_style
+        pyxl_style = NamedStyle(name=name, font=font, fill=fill, alignment=alignment, border=border,
+                                number_format=number_format)
 
-    return known_styles[style_dict]
+        known_styles[style_and_format_string] = pyxl_style
+
+    return known_styles[style_and_format_string]
 
 
 class StyleDict(dict):
@@ -124,7 +134,9 @@ class StyleDict(dict):
         """
         color = self.get(k, d)
         if hasattr(color, 'startswith') and color.startswith('#'):
-            return color[1:]
+            color = color[1:]
+            if len(color) == 3:  # Premailers reduces colors like #00ff00 to #0f0, openpyxl doesn't like that
+                color = ''.join(2 * c for c in color)
         return color
 
 
@@ -136,6 +148,7 @@ class Element(object):
     """
     def __init__(self, element, parent=None):
         self.element = element
+        self.number_format = None
         parent_style = parent.style_dict if parent else None
         self.style_dict = StyleDict(style_string_to_dict(element.get('style', '')), parent=parent_style)
         self._style_cache = None
@@ -145,7 +158,7 @@ class Element(object):
         Turn the css styles for this element into an openpyxl NamedStyle.
         """
         if not self._style_cache:
-            self._style_cache = style_dict_to_named_style(self.style_dict)
+            self._style_cache = style_dict_to_named_style(self.style_dict, number_format=self.number_format)
         return self._style_cache
 
     def get_dimension(self, dimension_key):
@@ -169,7 +182,7 @@ class Table(Element):
     """
     def __init__(self, table):
         """
-        takes an html table object (from BeautifulSoup)
+        takes an html table object (from lxml)
         """
         super(Table, self).__init__(table)
         table_head = table.find('thead')
@@ -184,7 +197,7 @@ class TableHead(Element):
     """
     def __init__(self, head, parent=None):
         super(TableHead, self).__init__(head, parent=parent)
-        self.rows = [TableRow(tr, parent=self) for tr in head.find_all('tr')]
+        self.rows = [TableRow(tr, parent=self) for tr in head.findall('tr')]
 
 
 class TableBody(Element):
@@ -193,7 +206,7 @@ class TableBody(Element):
     """
     def __init__(self, body, parent=None):
         super(TableBody, self).__init__(body, parent=parent)
-        self.rows = [TableRow(tr, parent=self) for tr in body.find_all('tr')]
+        self.rows = [TableRow(tr, parent=self) for tr in body.findall('tr')]
 
 
 class TableRow(Element):
@@ -202,7 +215,23 @@ class TableRow(Element):
     """
     def __init__(self, tr, parent=None):
         super(TableRow, self).__init__(tr, parent=parent)
-        self.cells = [TableCell(cell, parent=self) for cell in tr.find_all('th') + tr.find_all('td')]
+        self.cells = [TableCell(cell, parent=self) for cell in tr.findall('th') + tr.findall('td')]
+
+
+def element_to_string(el):
+    return _element_to_string(el).strip()
+
+
+def _element_to_string(el):
+    string = ''
+
+    for x in el.iterchildren():
+        string += '\n' + _element_to_string(x)
+
+    text = el.text.strip() if el.text else ''
+    tail = el.tail.strip() if el.tail else ''
+
+    return text + string + '\n' + tail
 
 
 class TableCell(Element):
@@ -212,12 +241,13 @@ class TableCell(Element):
     CELL_TYPES = {'TYPE_STRING', 'TYPE_FORMULA', 'TYPE_NUMERIC', 'TYPE_BOOL', 'TYPE_CURRENCY',
                   'TYPE_NULL', 'TYPE_INLINE', 'TYPE_ERROR', 'TYPE_FORMULA_CACHE_STRING', 'TYPE_INTEGER'}
 
-    def __init__(self, *args, **kwargs):
-        super(TableCell, self).__init__(*args, **kwargs)
-        self.value = self.element.get_text(separator="\n", strip=True)
+    def __init__(self, cell, parent=None):
+        super(TableCell, self).__init__(cell, parent=parent)
+        self.value = element_to_string(cell)
+        self.number_format = self.get_number_format()
 
     def data_type(self):
-        cell_types = self.CELL_TYPES & set(self.element.get('class', []))
+        cell_types = self.CELL_TYPES & set(self.element.get('class', '').split())
         if cell_types:
             if 'TYPE_FORMULA' in cell_types:
                 # Make sure TYPE_FORMULA takes precedence over the other classes in the set.
@@ -230,12 +260,12 @@ class TableCell(Element):
             cell_type = 'TYPE_STRING'
         return getattr(Cell, cell_type)
 
-    def number_format(self):
-        if 'TYPE_CURRENCY' in self.element.get('class', []):
+    def get_number_format(self):
+        if 'TYPE_CURRENCY' in self.element.get('class', '').split():
             return FORMAT_CURRENCY_USD_SIMPLE
-        if 'TYPE_INTEGER' in self.element.get('class', []):
+        if 'TYPE_INTEGER' in self.element.get('class', '').split():
             return '#,##0'
-        if 'TYPE_DATE' in self.element.get('class', []):
+        if 'TYPE_DATE' in self.element.get('class', '').split():
             return FORMAT_DATE_MMDDYYYY
         if self.data_type() == Cell.TYPE_NUMERIC:
             try:
@@ -246,14 +276,7 @@ class TableCell(Element):
                 return '#,##0'
 
     def format(self, cell):
-        style = self.style()
-        cell.font = style.font
-        cell.alignment = style.alignment
-        cell.fill = style.fill
-        cell.border = style.border
+        cell.style = self.style()
         data_type = self.data_type()
         if data_type:
             cell.data_type = data_type
-        number_format = self.number_format()
-        if number_format:
-            cell.number_format = number_format
