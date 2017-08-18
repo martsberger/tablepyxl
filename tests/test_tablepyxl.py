@@ -128,7 +128,7 @@ class TestTablepyxl(unittest.TestCase):
     def test_comments(self):
         wb = document_to_workbook(table_comment)
         sheet = wb['comment table']
-        self.assertNotEqual(sheet['A1'].value, 'this is a html comment')
+        self.assertNotIn('this is a html comment', sheet['A1'].value)
         self.assertEqual(sheet['B1'].value, 'this is not a html comment')
 
     def test_spans(self):
