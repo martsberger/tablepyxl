@@ -75,6 +75,13 @@ table_whitespace = "<table name='whitespace table'>" \
                    "</tbody>" \
                    "</table>"
 
+table_comment = "<table name='comment table'>" \
+                "<tr>" \
+                "<td><!-- this is a html comment --></td>" \
+                "<td>this is not a html comment</td>" \
+                "</tr>" \
+                "</table>"
+
 
 class TestTablepyxl(unittest.TestCase):
     """
@@ -117,6 +124,12 @@ class TestTablepyxl(unittest.TestCase):
         # Add another sheet to the existing workbook
         wb = document_to_workbook(table_three, wb=wb)
         self.assertEqual(wb.sheetnames, ['simple table', 'second table', 'Another simple table'])
+
+    def test_comments(self):
+        wb = document_to_workbook(table_comment)
+        sheet = wb['comment table']
+        self.assertNotEqual(sheet['A1'].value, 'this is a html comment')
+        self.assertEqual(sheet['B1'].value, 'this is not a html comment')
 
     def test_spans(self):
         doc = table_span
