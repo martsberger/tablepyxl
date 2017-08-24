@@ -16,6 +16,9 @@ def string_to_int(s):
 
 def get_Tables(doc):
     tree = html.fromstring(doc)
+    comments = tree.xpath('//comment()')
+    for comment in comments:
+        comment.drop_tag()
     return [Table(table) for table in tree.xpath('//table')]
 
 
