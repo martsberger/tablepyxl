@@ -61,7 +61,7 @@ def style_dict_to_named_style(style_dict, number_format=None):
         bg_color = style_dict.get_color('background-color')
         fg_color = style_dict.get_color('foreground-color', Color())
         fill_type = style_dict.get('fill-type')
-        if bg_color:
+        if bg_color and bg_color != 'transparent':
             fill = PatternFill(fill_type=fill_type or FILL_SOLID,
                                start_color=bg_color,
                                end_color=fg_color)
