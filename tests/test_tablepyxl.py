@@ -224,6 +224,11 @@ class TestStyle(unittest.TestCase):
         style_dict_to_named_style(d)
         self.assertEqual(len(known_styles), known_styles_length + 1)
 
+    def test_transparency(self):
+        d = StyleDict({'font-weight': 'bold', 'background-color': 'transparent'})
+        s = NamedStyle(name='Style {}'.format(len(known_styles) + 1), font=Font(bold=True),
+                       alignment=Alignment(horizontal='general', vertical=None, wrap_text=False))
+        self.assertEqual(style_dict_to_named_style(d), s)
 
     def test_parent(self):
         parent = StyleDict({'parent': 'mother'})
