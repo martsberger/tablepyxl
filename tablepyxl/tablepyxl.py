@@ -76,7 +76,7 @@ def document_to_workbook(doc, wb=None, base_url=None):
     """
     if not wb:
         wb = Workbook()
-        wb.remove_sheet(wb.active)
+        wb.remove(wb.active)
 
     inline_styles_doc = Premailer(doc, base_url=base_url, remove_classes=False).transform()
     tables = get_Tables(inline_styles_doc)

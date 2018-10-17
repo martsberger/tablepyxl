@@ -135,8 +135,9 @@ class TestTablepyxl(unittest.TestCase):
         doc = table_span
         wb = document_to_workbook(doc)
         sheet = wb['span table']  # Get sheet with the title `span table`
-        self.assertIn("A1:C1", sheet.merged_cell_ranges)
-        self.assertIn("A2:A5", sheet.merged_cell_ranges)
+
+        self.assertIn("A1:C1", [x.coord for x in sheet.merged_cells.ranges])
+        self.assertIn("A2:A5", [x.coord for x in sheet.merged_cells.ranges])
 
     def test_width(self):
         doc = table_widths

@@ -1,5 +1,5 @@
 lxml==3.7.3
-openpyxl==2.4.1
+openpyxl==2.5.8
 premailer==2.9.2
 pytest==2.8.7
 requests==2.7.0
