@@ -1,6 +1,6 @@
-lxml==3.7.3
+lxml==4.2.5
 openpyxl==2.5.8
-premailer==2.9.2
-pytest==2.8.7
-requests==2.7.0
-tox==2.3.1
+premailer==3.2.0
+pytest==3.9.1
+requests==2.19.1
+tox==3.5.2
