@@ -109,4 +109,4 @@ def insert_table_at_cell(table, cell):
     """
     ws = cell.parent
     column, row = cell.column, cell.row
-    insert_table(table, ws, column_index_from_string(column), row)
+    insert_table(table, ws, column, row)

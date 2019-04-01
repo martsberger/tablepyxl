@@ -1,7 +1,7 @@
 # This is where we handle translating css styles into openpyxl styles
 # and cascading those from parent to child in the dom.
 
-from openpyxl.cell import Cell
+from openpyxl.cell import Cell, cell
 from openpyxl.styles import Font, Alignment, PatternFill, NamedStyle, Border, Side, Color
 from openpyxl.styles.fills import FILL_SOLID
 from openpyxl.styles.numbers import FORMAT_CURRENCY_USD_SIMPLE
@@ -258,7 +258,7 @@ class TableCell(Element):
                 cell_type = cell_types.pop()
         else:
             cell_type = 'TYPE_STRING'
-        return getattr(Cell, cell_type)
+        return getattr(cell, cell_type)
 
     def get_number_format(self):
         if 'TYPE_CURRENCY' in self.element.get('class', '').split():
@@ -267,7 +267,7 @@ class TableCell(Element):
             return '#,##0'
         if 'TYPE_DATE' in self.element.get('class', '').split():
             return FORMAT_DATE_MMDDYYYY
-        if self.data_type() == Cell.TYPE_NUMERIC:
+        if self.data_type() == cell.TYPE_NUMERIC:
             try:
                 int(self.value)
             except ValueError:
