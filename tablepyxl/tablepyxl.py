@@ -3,7 +3,7 @@ from __future__ import absolute_import
 
 from lxml import html
 from openpyxl import Workbook
-from openpyxl.utils import column_index_from_string, get_column_letter
+from openpyxl.utils import get_column_letter
 from premailer import Premailer
 from tablepyxl.style import Table
 

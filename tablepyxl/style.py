@@ -1,7 +1,7 @@
 # This is where we handle translating css styles into openpyxl styles
 # and cascading those from parent to child in the dom.
 
-from openpyxl.cell import Cell, cell
+from openpyxl.cell import cell
 from openpyxl.styles import Font, Alignment, PatternFill, NamedStyle, Border, Side, Color
 from openpyxl.styles.fills import FILL_SOLID
 from openpyxl.styles.numbers import FORMAT_CURRENCY_USD_SIMPLE
