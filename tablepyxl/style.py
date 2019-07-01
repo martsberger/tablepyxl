@@ -4,7 +4,7 @@
 from openpyxl.cell import cell
 from openpyxl.styles import Font, Alignment, PatternFill, NamedStyle, Border, Side, Color
 from openpyxl.styles.fills import FILL_SOLID
-from openpyxl.styles.numbers import FORMAT_CURRENCY_USD_SIMPLE
+from openpyxl.styles.numbers import FORMAT_CURRENCY_USD_SIMPLE, FORMAT_PERCENTAGE
 from openpyxl.styles.colors import BLACK
 
 FORMAT_DATE_MMDDYYYY = 'mm/dd/yyyy'
@@ -238,7 +238,7 @@ class TableCell(Element):
     """
     This class maps to the `<td>` element of the html table.
     """
-    CELL_TYPES = {'TYPE_STRING', 'TYPE_FORMULA', 'TYPE_NUMERIC', 'TYPE_BOOL', 'TYPE_CURRENCY',
+    CELL_TYPES = {'TYPE_STRING', 'TYPE_FORMULA', 'TYPE_NUMERIC', 'TYPE_BOOL', 'TYPE_CURRENCY', 'TYPE_PERCENTAGE',
                   'TYPE_NULL', 'TYPE_INLINE', 'TYPE_ERROR', 'TYPE_FORMULA_CACHE_STRING', 'TYPE_INTEGER'}
 
     def __init__(self, cell, parent=None):
@@ -252,7 +252,7 @@ class TableCell(Element):
             if 'TYPE_FORMULA' in cell_types:
                 # Make sure TYPE_FORMULA takes precedence over the other classes in the set.
                 cell_type = 'TYPE_FORMULA'
-            elif 'TYPE_CURRENCY' in cell_types or 'TYPE_INTEGER' in cell_types:
+            elif cell_types & {'TYPE_CURRENCY', 'TYPE_INTEGER', 'TYPE_PERCENTAGE'}:
                 cell_type = 'TYPE_NUMERIC'
             else:
                 cell_type = cell_types.pop()
@@ -265,6 +265,8 @@ class TableCell(Element):
             return FORMAT_CURRENCY_USD_SIMPLE
         if 'TYPE_INTEGER' in self.element.get('class', '').split():
             return '#,##0'
+        if 'TYPE_PERCENTAGE' in self.element.get('class', '').split():
+            return FORMAT_PERCENTAGE
         if 'TYPE_DATE' in self.element.get('class', '').split():
             return FORMAT_DATE_MMDDYYYY
         if self.data_type() == cell.TYPE_NUMERIC:
