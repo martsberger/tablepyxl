@@ -252,7 +252,7 @@ class TableCell(Element):
             if 'TYPE_FORMULA' in cell_types:
                 # Make sure TYPE_FORMULA takes precedence over the other classes in the set.
                 cell_type = 'TYPE_FORMULA'
-            elif 'TYPE_CURRENCY' in cell_types or 'TYPE_INTEGER' in cell_types or 'TYPE_PERCENTAGE' in cell_types:
+            elif cell_types & {'TYPE_CURRENCY', 'TYPE_INTEGER', 'TYPE_PERCENTAGE'}:
                 cell_type = 'TYPE_NUMERIC'
             else:
                 cell_type = cell_types.pop()
