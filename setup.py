@@ -2,10 +2,10 @@ from setuptools import setup, find_packages
 
 setup(
     name='tablepyxl',
-    version='0.6.0',
+    version='0.6.1',
     description='Generate Excel documents from html tables',
     url='https://github.com/martsberger/tablepyxl',
-    download_url='https://github.com/martsberger/tablepyxl/archive/0.6.0.tar.gz',
+    download_url='https://github.com/martsberger/tablepyxl/archive/0.6.1.tar.gz',
     author='Brad Martsberger, Asma Mehjabeen, Brian Davis',
     author_email='bmarts@lumere.com',
     license='MIT',
