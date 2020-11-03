@@ -40,21 +40,21 @@ table = doc.read()
 tablepyxl.document_to_xl(table, "/path/to/output")
 ```
 
-Convert your html to an openpyxl workbook object instead of a file so that you can do further work:
+Convert your html to an openpyxl workbook object instead of a file so that you can do further work with the `document_to_workbook` function:
 ```
 from tablepyxl import tablepyxl
 
 doc = open("/file/with/html/table", "r")
 table = doc.read()
 
-wb = tablepyxl.document_to_wb(table)
+wb = tablepyxl.document_to_workbook(table)
 
 # For example, you can add another document to the same workbook
 # in a new sheet:
 doc2 = open("/file/with/html/table2", "r")
 table2 = doc2.read()
 
-wb = tablepyxl.document_to_wb(table, wb=wb)
+wb = tablepyxl.document_to_workbook(table, wb=wb)
 ```
 
 Notes:
