@@ -2,6 +2,7 @@
 from __future__ import absolute_import
 
 from lxml import html
+from openpyxl.cell.cell import MergedCell
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
 from premailer import Premailer
@@ -37,6 +38,10 @@ def write_rows(worksheet, elem, row, column=1):
                 worksheet.merge_cells(start_row=row, start_column=column,
                                       end_row=row + rowspan - 1, end_column=column + colspan - 1)
             cell = worksheet.cell(row=row, column=column)
+            while isinstance(cell, MergedCell):
+                column +=1
+                cell = worksheet.cell(row=row, column=column)
+
             cell.value = table_cell.value
             table_cell.format(cell)
             min_width = table_cell.get_dimension('min-width')
